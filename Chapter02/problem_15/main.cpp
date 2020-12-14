@@ -3,21 +3,36 @@
 #include <sstream>
 #include <assert.h>
 
+// IPv4 アドレスを表すクラス
 class ipv4
 {
+   // 固定長配列
    std::array<unsigned char, 4> data;
 public:
+   // コンストラクター群
+   // 1. 可能な限り constexpr を付ける
+   // 2. 可能な限り noexcept を付ける
+
+   // デフォルトコンストラクター
    constexpr ipv4() :data{ {0} } {}
-   constexpr ipv4(unsigned char const a, unsigned char const b, 
+
+   // メンバーすべてを明示的に入力するコンストラクター
+   constexpr ipv4(unsigned char const a, unsigned char const b,
                   unsigned char const c, unsigned char const d):
       data{{a,b,c,d}} {}
+
+   // ある種の変換コンストラクター
    explicit constexpr ipv4(unsigned long a) :
-      data{ { static_cast<unsigned char>((a >> 24) & 0xFF), 
+      data{ { static_cast<unsigned char>((a >> 24) & 0xFF),
               static_cast<unsigned char>((a >> 16) & 0xFF),
               static_cast<unsigned char>((a >> 8) & 0xFF),
               static_cast<unsigned char>(a & 0xFF) } } {}
+
+   // コピーコンストラクター
    ipv4(ipv4 const & other) noexcept : data(other.data) {}
-   ipv4& operator=(ipv4 const & other) noexcept 
+
+   // コピー代入演算子
+   ipv4& operator=(ipv4 const & other) noexcept
    {
       data = other.data;
       return *this;
@@ -26,9 +41,10 @@ public:
    std::string to_string() const
    {
       std::stringstream sstr;
+      // ここで暗黙の変換を期待している
       sstr << *this;
       return sstr.str();
-   } 
+   }
 
    constexpr unsigned long to_ulong() const noexcept
    {
@@ -41,7 +57,7 @@ public:
 
    friend std::ostream& operator<<(std::ostream& os, const ipv4& a)
    {
-      os << static_cast<int>(a.data[0]) << '.' 
+      os << static_cast<int>(a.data[0]) << '.'
          << static_cast<int>(a.data[1]) << '.'
          << static_cast<int>(a.data[2]) << '.'
          << static_cast<int>(a.data[3]);
@@ -56,6 +72,7 @@ public:
       if (d1 == '.' && d2 == '.' && d3 == '.')
          a = ipv4(b1, b2, b3, b4);
       else
+         // setstate については C++ の教科書の入出力の章を参照
          is.setstate(std::ios_base::failbit);
 
       return is;
@@ -75,6 +92,9 @@ int main()
    ipv4 ip;
    std::cout << ip << std::endl;
    std::cin >> ip;
-   if(!std::cin.fail())
+   // istream の >> の呼び出し後は状態をテストするのがマナー
+   if(!std::cin.fail()){
+      // 上記実装で 333.333.333.333 と入力すると 77.77.77.77 が出力される。
       std::cout << ip << std::endl;
+   }
 }

@@ -1,23 +1,38 @@
+// 基本演算を備えた二次元配列
 #include <iostream>
 #include <vector>
 #include <algorithm>
 #include <iterator>
 
+// クラステンプレート
 template <class T, size_t R, size_t C>
 class array2d
 {
+   // 標準ライブラリー志向の typedef
    typedef T                 value_type;
    typedef value_type*       iterator;
    typedef value_type const* const_iterator;
 
+   // vector を使う
+   // 本書では本クラスを vector のアダプターであると表現している。
+   // 行と列の扱いについては p. 26 の説明が本質的なので読んでおくこと。
    std::vector<T> arr;
+
 public:
+   // デフォルトコンストラクター
    array2d() :arr(R*C) {}
+
+   // 初期化によるコンストラクター
    explicit array2d(std::initializer_list<T> l):arr(l) {}
+
+   // 以下、constexpr, noexcept を忘れずに
+
+   // よくある data()
    constexpr T* data() noexcept { return arr.data(); }
    constexpr T const * data() const noexcept { return arr.data(); }
 
-   constexpr T& at(size_t const r, size_t const c) 
+   // at() は二次元仕様になる
+   constexpr T& at(size_t const r, size_t const c)
    {
       return arr.at(r*C + c);
    }
@@ -27,21 +42,26 @@ public:
       return arr.at(r*C + c);
    }
 
+   // operator() は二次元仕様
+   // なお operator[] を提供するなら無理をしないといけない（本書の記述参照）
    constexpr T& operator() (size_t const r, size_t const c)
    {
       return arr[r*C + c];
    }
 
+   // operator() は二次元仕様
    constexpr T const & operator() (size_t const r, size_t const c) const
    {
       return arr[r*C + c];
    }
 
+   // arr.empty() とはしない？
    constexpr bool empty() const noexcept
    {
       return R == 0 || C == 0;
    }
 
+   // これは説明を要する
    constexpr size_t size(int const rank) const
    {
       if (rank == 1) return R;
@@ -63,8 +83,11 @@ public:
    const_iterator end() const { return arr.data() + arr.size(); }
    iterator begin() { return arr.data(); }
    iterator end() { return arr.data() + arr.size(); }
+
+   // cbegin(), cend() も要るか？
 };
 
+// p. 26 の説明を参照。
 template <class T, size_t R, size_t C>
 void print_array2d(array2d<T, R, C> const & arr)
 {
@@ -108,6 +131,7 @@ int main()
    {
       std::cout << "test move semantics" << std::endl;
 
+      // 冷静に考えると、この初期化コードはそれほどわかりやすくない。
       array2d<int, 2, 3> a{10,20,30,40,50,60};
       print_array2d(a);
 
@@ -157,7 +181,7 @@ int main()
       std::cout << std::endl;
 
       std::copy(
-         std::begin(a), std::end(a), 
+         std::begin(a), std::end(a),
          std::ostream_iterator<int>(std::cout, " "));
 
       std::cout << std::endl;

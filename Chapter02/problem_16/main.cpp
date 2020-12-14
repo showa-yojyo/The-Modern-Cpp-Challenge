@@ -1,3 +1,4 @@
+// IPv4 の範囲を与えて、該当するものを出力するプログラム
 #include <iostream>
 #include <array>
 #include <sstream>
@@ -38,6 +39,8 @@ public:
       return sstr.str();
    }
 
+   // ここまでは前項と同じ
+
    constexpr bool is_loopback() const noexcept
    {
       return (to_ulong() & 0xFF000000) == 0x7F000000;
@@ -68,6 +71,9 @@ public:
       return (to_ulong() & 0xF0000000) == 0xE0000000;
    }
 
+   // インクリメント演算子のオーバーロード
+   // C++03 と同様に実装する
+
    ipv4& operator++()
    {
       *this = ipv4(1 + to_ulong());
@@ -80,6 +86,9 @@ public:
       ++(*this);
       return *this;
    }
+
+   // 比較演算子オーバーロード
+   // C++03 と同様に実装する
 
    friend bool operator==(ipv4 const & a1, ipv4 const & a2) noexcept
    {
@@ -111,6 +120,8 @@ public:
       return !(a1 < a2);
    }
 
+   // 以下、前項と同様
+
    friend std::ostream& operator<<(std::ostream& os, const ipv4& a)
    {
       os << static_cast<int>(a.data[0]) << '.'
@@ -134,6 +145,7 @@ public:
    }
 };
 
+// メインのロジックは目新しいことはない。
 int main()
 {
    std::cout << "input range: ";

@@ -1,6 +1,8 @@
+// さまざまな温度単位のリテラル
 #include <cmath>
-#include <assert.h>
+#include <cassert>
 
+// よくあるトレランス付き比較
 bool are_equal(double const d1, double const d2, double const epsilon = 0.001)
 {
    return std::fabs(d1 - d2) < epsilon;
@@ -22,8 +24,11 @@ namespace temperature
    public:
       constexpr explicit quantity(double const a) : amount(a) {}
 
+      // 変換演算子に explicit を付けられる
       explicit operator double() const { return amount; }
    };
+
+   // 同じ単位同士の比較演算
 
    template <scale S>
    inline bool operator==(quantity<S> const & lhs, quantity<S> const & rhs)
@@ -61,6 +66,8 @@ namespace temperature
       return !(lhs < rhs);
    }
 
+   // 同じ単位同士の加減演算
+
    template <scale S>
    constexpr quantity<S> operator+(quantity<S> const &q1, quantity<S> const &q2)
    {
@@ -73,11 +80,17 @@ namespace temperature
       return quantity<S>(static_cast<double>(q1) - static_cast<double>(q2));
    }
 
+   // 以下、テンプレート特殊化を応用した何かをする
+
    template <scale S, scale R>
    struct conversion_traits
    {
+      // この = delete の利用法はおもしろい。
+      // 特殊化で定義しなくてはならないということか。
       static double convert(double const value) = delete;
    };
+
+   // 以下、異なる単位同士の convert() を実装する。
 
    template <>
    struct conversion_traits<scale::celsius, scale::kelvin>
@@ -133,12 +146,15 @@ namespace temperature
       }
    };
 
+   // 最後にキャストを提供する。
+
    template <scale R, scale S>
    constexpr quantity<R> temperature_cast(quantity<S> const q)
    {
       return quantity<R>(conversion_traits<S, R>::convert(static_cast<double>(q)));
    }
 
+   // リテラル演算子を部分名前空間に定義する
    namespace temperature_scale_literals
    {
       constexpr quantity<scale::celsius> operator "" _deg(long double const amount)
@@ -163,6 +179,7 @@ int main()
    using namespace temperature;
    using namespace temperature_scale_literals;
 
+   // この auto の使い方もさりげなく重要
    auto t1{ 36.5_deg };
    auto t2{ 79.0_f };
    auto t3{ 100.0_k };

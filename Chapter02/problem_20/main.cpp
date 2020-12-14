@@ -1,27 +1,36 @@
-#include <iostream>
+// コンテナの any, all, none
+#include <algorithm>
 #include <vector>
 #include <array>
 #include <list>
-#include <assert.h>
+#include <cassert>
 
+// これはふつう
 template<class C, class T>
 bool contains(C const & c, T const & value)
 {
-   return std::end(c) != std::find(std::begin(c), std::end(c), value);
+   // 本書では cbegin/cend を採用。
+   return std::cend(c) != std::find(std::cbegin(c), std::cend(c), value);
 }
 
+// ここがモダン
 template<class C, class... T>
 bool contains_any(C const & c, T &&... value)
 {
+   // 畳み込み
+   // 左部分が true なら右部分の contains() が呼び出されないとのこと。
+   // このような short circuit は以下同様。
    return (... || contains(c, value));
 }
 
 template<class C, class... T>
 bool contains_all(C const & c, T &&... value)
 {
+   // 畳み込み
    return (... && contains(c, value));
 }
 
+// 論理的には none() は !any() でなければならないので：
 template<class C, class... T>
 bool contains_none(C const & c, T &&... value)
 {

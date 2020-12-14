@@ -1,3 +1,5 @@
+// システムハンドルラッパー
+// 後回し
 #ifdef _WIN32
 #include <windows.h>
 #else
@@ -29,10 +31,10 @@ struct OVERLAPPED
             DWORD Offset;
             DWORD OffsetHigh;
         } DUMMYSTRUCTNAME;
-        
+
         void* Pointer;
     } DUMMYUNIONNAME;
-    
+
     HANDLE hEvent;
 };
 
@@ -66,28 +68,35 @@ int ReadFile(HANDLE,
 
 #include <algorithm>
 #include <vector>
+#include <stdexcept> // std::runtime_error
 
 template <typename Traits>
 class unique_handle
 {
+   // モダンな using の使い方
    using pointer = typename Traits::pointer;
 
    pointer m_value;
 
 public:
+   // コンパイラーが生成するデフォルトコンストラクターとコピー代入演算子はないものとする。
    unique_handle(unique_handle const &) = delete;
    unique_handle& operator=(unique_handle const &) = delete;
 
+   // ある意味デフォルトコンストラクター
    explicit unique_handle(pointer value = Traits::invalid()) noexcept
       :m_value{ value }
    {}
 
+   // ムーブコンストラクター
    unique_handle(unique_handle && other) noexcept
       : m_value{ other.release() }
    {}
 
+   // ムーブ代入演算子
    unique_handle& operator=(unique_handle && other) noexcept
    {
+      // このテストは必要？
       if (this != &other)
       {
          reset(other.release());
@@ -135,6 +144,7 @@ public:
    }
 };
 
+// グローバル名前空間に関数テンプレート swap() を与える
 template <typename Traits>
 void swap(unique_handle<Traits> & left,
    unique_handle<Traits> & right) noexcept
@@ -164,6 +174,7 @@ struct null_handle_traits
 
    static pointer invalid() noexcept
    {
+      // とりあえず nullptr を援用する
       return nullptr;
    }
 
@@ -207,29 +218,30 @@ void bad_handle_example()
                                OPEN_EXISTING,
                                FILE_ATTRIBUTE_NORMAL,
                                nullptr);
-    
+
     if (handle == INVALID_HANDLE_VALUE)
         return;
-    
+
     if (condition1)
     {
         CloseHandle(handle);
         return;
     }
-    
+
     std::vector<char> buffer(1024);
     unsigned long bytesRead = 0;
+    // C++ のオブジェクトを C に渡す方法の例を示している。
     ReadFile(handle, buffer.data(), buffer.size(), &bytesRead, nullptr);
-    
+
     if (condition2)
     {
         // oops, forgot to close handle
         return;
     }
-    
+
     // throws exception; the next line will not execute
     function_that_throws();
-    
+
     CloseHandle(handle);
 }
 
@@ -237,7 +249,7 @@ void good_handle_example()
 {
     bool condition1 = false;
     bool condition2 = true;
-    
+
     invalid_handle handle{
         CreateFile("sample.txt",
                    GENERIC_READ,
@@ -246,11 +258,11 @@ void good_handle_example()
                    OPEN_EXISTING,
                    FILE_ATTRIBUTE_NORMAL,
                    nullptr) };
-    
+
     if (!handle) return;
-    
+
     if (condition1) return;
-    
+
     std::vector<char> buffer(1024);
     unsigned long bytesRead = 0;
     ReadFile(handle.get(),
@@ -258,9 +270,9 @@ void good_handle_example()
              buffer.size(),
              &bytesRead,
              nullptr);
-    
+
     if (condition2) return;
-    
+
     function_that_throws();
 }
 
@@ -271,12 +283,12 @@ int main()
         bad_handle_example();
     }
     catch (...) {}
-    
+
     try
     {
         good_handle_example();
     }
     catch (...) {}
-    
+
     return 0;
 }
