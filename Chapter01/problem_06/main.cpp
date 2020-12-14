@@ -4,7 +4,10 @@
 int sum_proper_divisors(int const number)
 {
    int result = 1;
-   for (int i = 2; i <= std::sqrt(number); i++)
+   // これは書籍版のコードのほうがいいので書き換える。
+   //for (int i = 2; i <= std::sqrt(number); i++)
+   int root = static_cast<int>(std::sqrt(number));
+   for (int i = 2; i <= root; i++)
    {
       if (number%i == 0)
       {
@@ -19,6 +22,7 @@ void print_abundant(int const limit)
 {
    for (int number = 10; number <= limit; ++number)
    {
+      // いちばん基本的な auto の用例
       auto sum = sum_proper_divisors(number);
       if (sum > number)
       {

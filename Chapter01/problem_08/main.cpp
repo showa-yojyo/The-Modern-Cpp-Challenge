@@ -1,18 +1,22 @@
+// 本書のコードよりもえらく分量が多くなっている
 #include <iostream>
 #include <vector>
 #include <numeric>
 #include <cmath>
 #include <chrono>
 
+// クラステンプレート
 template <typename Time = std::chrono::microseconds,
    typename Clock = std::chrono::high_resolution_clock>
    struct perf_timer
 {
+   // Python なら decorator で実装するような機能
    template <typename F, typename... Args>
    static Time duration(F&& f, Args... args)
    {
       auto start = Clock::now();
 
+      // std::invole(f, args) については要調査
       std::invoke(std::forward<F>(f), std::forward<Args>(args)...);
 
       auto end = Clock::now();
@@ -21,8 +25,10 @@ template <typename Time = std::chrono::microseconds,
    }
 };
 
+// これが本書のコード
 void print_narcissistics_1(bool const printResults)
 {
+   // 3 ケタなので三重ループ
    for (int a = 1; a <= 9; a++)
    {
       for (int b = 0; b <= 9; b++)
@@ -72,6 +78,8 @@ void print_narcissistics_3(int const limit, bool const printResults)
          n = n / 10;
       }
 
+      // ラムダの利用例
+      // キャプチャーに注意
       int arm = std::accumulate(
          std::begin(digits), std::end(digits),
          0,
@@ -90,6 +98,8 @@ int main()
    print_narcissistics_2(true);
    print_narcissistics_3(1000, true);
 
+   // これは面白い。
+   // ラムダ式の実行時間を計測するのはこう書けるのか。
    auto t1 = perf_timer<>::duration([]() { for (int i = 0; i < 10000; ++i) print_narcissistics_1(false); });
    std::cout << std::chrono::duration<double, std::milli>(t1).count() << "ms" << std::endl;
 

@@ -1,4 +1,5 @@
 #include <iostream>
+#include <numeric>
 
 unsigned int gcd(unsigned int const a, unsigned int const b)
 {
@@ -31,4 +32,9 @@ int main()
    std::cout
       << "    gcd(" << a << ", " << b << ")="
       << gcd2(a, b) << std::endl;
+
+   // C++17 には <numeric> に std::gcd() がある (p. 4)
+   std::cout
+      << "    gcd(" << a << ", " << b << ")="
+      << std::gcd(a, b) << std::endl;
 }

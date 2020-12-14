@@ -6,6 +6,7 @@ int main()
    std::cout << "Upper limit:";
    std::cin >> limit;
 
+   // 大きな上限まで加算するために long long を使う (p. 3)
    unsigned long long sum = 0;
    for (unsigned int i = 3; i < limit; ++i)
    {

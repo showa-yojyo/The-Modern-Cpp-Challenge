@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 
+// いつものように long long に注意
 std::pair<unsigned long long, long> longest_collatz_uncached(unsigned long long const limit)
 {
    long length = 0;
@@ -36,21 +37,21 @@ std::pair<unsigned long long, long> longest_collatz(unsigned long long const lim
 
    std::vector<int> cache(limit + 1, 0);
 
-   for (unsigned long long i = 2; i <= limit; i++) 
+   for (unsigned long long i = 2; i <= limit; i++)
    {
       auto n = i;
       long steps = 0;
-      while (n != 1 && n >= i) 
+      while (n != 1 && n >= i)
       {
-         if ((n % 2) == 0) 
+         if ((n % 2) == 0)
             n = n / 2;
-         else 
+         else
             n = n * 3 + 1;
          steps++;
       }
       cache[i] = steps + cache[n];
 
-      if (cache[i] > length) 
+      if (cache[i] > length)
       {
          length = cache[i];
          number = i;
@@ -69,7 +70,8 @@ int main()
       long steps;
    };
 
-   std::vector<test_data> data 
+   // unsigned long long の suffix は珍しい
+   std::vector<test_data> data
    {
       { 10ULL, 9ULL, 19 },
       { 100ULL, 97ULL, 118 },
@@ -81,13 +83,14 @@ int main()
       { 100000000ULL, 63728127ULL, 949 }
    };
 
+   // 範囲 for 文
    for (auto const & d : data)
    {
       auto result = longest_collatz(d.limit);
 
       if (result.first != d.start || result.second != d.steps)
          std::cout << "error on limit " << d.limit << std::endl;
-      else 
+      else
          std::cout
             << "less than      : " << d.limit << std::endl
             << "starting number: " << result.first << std::endl

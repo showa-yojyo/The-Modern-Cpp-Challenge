@@ -2,9 +2,11 @@
 #include <set>
 #include <cmath>
 
+// 前項と同じものになる
 int sum_proper_divisors(int const number)
 {
    int result = 1;
+   // この for loop の終了条件もスコープの外に出す
    for (int i = 2; i <= std::sqrt(number); i++)
    {
       if (number%i == 0)
@@ -34,6 +36,7 @@ void print_amicables(int const limit)
    }
 }
 
+// こちらは練習問題の解答例だろう
 void print_amicables_once(int const limit)
 {
    std::set<int> printed;
