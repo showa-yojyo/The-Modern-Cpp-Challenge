@@ -1,7 +1,8 @@
+// #30 URL パーツの抽出
 #include <string>
 #include <string_view>
 #include <regex>
-#include <assert.h>
+#include <cassert>
 
 #ifdef USE_BOOST_OPTIONAL
 #  include <boost/optional.hpp>
@@ -23,6 +24,7 @@ struct uri_parts
 
 optional<uri_parts> parse_uri(std::string uri)
 {
+   // この正規表現は無理にでも覚えておきたい
    std::regex rx(R"(^(\w+):\/\/([\w.-]+)(:(\d+))?([\w\/\.]+)?(\?([\w=&]*)(#?(\w+))?)?$)");
    auto matches = std::smatch{};
 

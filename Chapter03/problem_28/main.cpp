@@ -1,7 +1,8 @@
+// #28 最長回文部分文字列
 #include <string>
 #include <string_view>
 #include <vector>
-#include <assert.h>
+#include <cassert>
 
 std::string longest_palindrome(std::string_view str)
 {
@@ -9,6 +10,7 @@ std::string longest_palindrome(std::string_view str)
    size_t longestBegin = 0;
    size_t maxLen = 1;
 
+   // 部分問題の結果を格納する
    std::vector<bool> table(len * len, false);
 
    for (size_t i = 0; i < len; i++)
@@ -18,7 +20,7 @@ std::string longest_palindrome(std::string_view str)
 
    for (size_t i = 0; i < len - 1; i++)
    {
-      if (str[i] == str[i + 1]) 
+      if (str[i] == str[i + 1])
       {
          table[i*len + i + 1] = true;
          if (maxLen < 2)
@@ -46,12 +48,13 @@ std::string longest_palindrome(std::string_view str)
       }
    }
 
+   // std::string のコンストラクターが必要な理由は str がビューだから。
    return std::string(str.substr(longestBegin, maxLen));
 }
 
 int main()
 {
-   using namespace std::string_literals;
+   using namespace std::string_literals; // 使っていない
 
    assert(longest_palindrome("sahararahnide") == "hararah");
    assert(longest_palindrome("level") == "level");

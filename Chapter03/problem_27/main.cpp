@@ -1,8 +1,10 @@
+// #27 区切り文字集合で文字列をトークン分割する
 #include <string>
 #include <sstream>
 #include <vector>
-#include <assert.h>
+#include <cassert>
 
+// おなじみの別名定義
 template <class Elem>
 using tstring = std::basic_string<Elem, std::char_traits<Elem>, std::allocator<Elem>>;
 
@@ -29,6 +31,7 @@ inline std::vector<tstring<Elem>> split(tstring<Elem> text, tstring<Elem> const 
    auto tokens = std::vector<tstring<Elem>>{};
 
    size_t pos, prev_pos = 0;
+   // あまり見かけない find_first_of()
    while ((pos = text.find_first_of(delimiters, prev_pos)) != std::string::npos)
    {
       if (pos > prev_pos)
@@ -36,7 +39,7 @@ inline std::vector<tstring<Elem>> split(tstring<Elem> text, tstring<Elem> const 
       prev_pos = pos + 1;
    }
 
-   if (prev_pos< text.length())
+   if (prev_pos < text.length())
       tokens.push_back(text.substr(prev_pos, std::string::npos));
 
    return tokens;

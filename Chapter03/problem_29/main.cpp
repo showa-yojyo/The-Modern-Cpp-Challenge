@@ -1,11 +1,14 @@
+// #29 ナンバープレートの検証
 #include <string>
 #include <string_view>
 #include <regex>
-#include <assert.h>
+#include <cassert>
 
 bool validate_license_plate_format(std::string_view str)
 {
+   // 生文字列
    std::regex rx(R"([A-Z]{3}-[A-Z]{2} \d{3,4})");
+   // search ではなく match がふさわしいことに注意
    return std::regex_match(str.data(), rx);
 }
 
@@ -15,8 +18,9 @@ std::vector<std::string> extract_license_plate_numbers(std::string const & str)
    std::smatch match;
    std::vector<std::string> results;
 
-   for(auto i = std::sregex_iterator(std::cbegin(str), std::cend(str), rx); 
-       i != std::sregex_iterator(); ++i) 
+   // std::sregex_iterator の典型的な適用例
+   for(auto i = std::sregex_iterator(std::cbegin(str), std::cend(str), rx);
+       i != std::sregex_iterator(); ++i)
    {
       if((*i)[1].matched)
          results.push_back(i->str());
