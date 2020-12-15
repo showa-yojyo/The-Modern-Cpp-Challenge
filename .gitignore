@@ -1,3 +1,6 @@
+# Ignore all build subdirectories
+**/build
+
 # Cmake files
 CMakeLists.txt.user
 CMakeCache.txt
