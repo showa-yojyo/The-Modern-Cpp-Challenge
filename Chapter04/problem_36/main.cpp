@@ -1,4 +1,6 @@
+// #36 指定日付より古いファイルを削除する
 #include <iostream>
+// 時刻や時間を扱うには chrono をインクルードする
 #include <chrono>
 
 #ifdef USE_BOOST_FILESYSTEM
@@ -14,6 +16,7 @@ namespace fs = std::filesystem;
 #  endif
 #endif
 
+// この機能は昔からあった。
 namespace ch = std::chrono;
 
 template <typename Duration>
@@ -25,7 +28,9 @@ bool is_older_than(fs::path const & path, Duration const duration)
 #else
    auto ftimeduration = lastwrite.time_since_epoch();
 #endif
+   // 現在時刻とファイル更新時刻の差を計算する
    auto nowduration = (ch::system_clock::now() - duration).time_since_epoch();
+   // その差は指定時間より大きいか？
    return ch::duration_cast<Duration>(nowduration - ftimeduration).count() > 0;
 }
 
@@ -42,6 +47,7 @@ void remove_files_older_than(fs::path const & path, Duration const duration)
          }
          else if(fs::is_directory(path))
          {
+            // fs::directory_iterator() が急所
             for (auto const & entry : fs::directory_iterator(path))
             {
                remove_files_older_than(entry.path(), duration);
@@ -57,8 +63,11 @@ void remove_files_older_than(fs::path const & path, Duration const duration)
 
 int main()
 {
+   // 1h とか 20min とかを書けるようにする。
    using namespace std::chrono_literals;
 
+// こういうコードを書きたくないからライブラリーを使うのではないのか。
+// と思ったら本書のコードは UNIX 形式で通じると言っている。
 #ifdef _WIN32
    auto path = R"(..\Test\)";
 #else

@@ -1,3 +1,4 @@
+// #35 ディレクトリのサイズを計算する
 #include <iostream>
 #include <numeric>
 #include <string>
@@ -16,19 +17,23 @@ namespace fs = std::filesystem;
 #endif
 
 std::uintmax_t get_directory_size(
+
    fs::path const & dir,
-   bool const follow_symlinks = false)
+   bool follow_symlinks = false)
 {
 #ifdef USE_BOOST_FILESYSTEM
    auto iterator = fs::recursive_directory_iterator(
       dir,
       follow_symlinks ? fs::symlink_option::recurse : fs::symlink_option::none);
 #else
+   // ディレクトリーのすべてのファイルを再帰的に反復する
    auto iterator = fs::recursive_directory_iterator(
       dir,
       follow_symlinks ? fs::directory_options::follow_directory_symlink : fs::directory_options::none);
 #endif
 
+   // std::accumulate() にラムダ式で演算を与える。
+   // いつものように uintmax_t などを採用することに注意。
    return std::accumulate(
       fs::begin(iterator), fs::end(iterator),
       0ull,
@@ -44,5 +49,6 @@ int main()
    std::string path;
    std::cout << "Path: ";
    std::cin >> path;
+   // バイト単位で出力するのでわかりづらければ改良するといい。
    std::cout << "Size: " << get_directory_size(path) << std::endl;
 }

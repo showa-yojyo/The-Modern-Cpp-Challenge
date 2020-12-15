@@ -1,6 +1,9 @@
+// #38 一時ログファイル
+// TODO: 動作確認
 #include <iostream>
 #include <fstream>
 
+// CMake でのパス指定ができない
 #include "uuid.h"
 
 #ifdef USE_BOOST_FILESYSTEM

@@ -1,3 +1,4 @@
+// #37 ディレクトリ内で正規表現にマッチするファイルを見つける
 #include <iostream>
 #include <regex>
 #include <vector>
@@ -25,10 +26,12 @@ std::vector<fs::directory_entry> find_files(
    std::vector<fs::directory_entry> result;
    std::regex rx(regex.data());
 
+   // fs::recursive_directory_iterator の使い方
    std::copy_if(
       fs::recursive_directory_iterator(path),
       fs::recursive_directory_iterator(),
       std::back_inserter(result),
+      // ラムダ式のキャプチャーに注意
       [&rx](fs::directory_entry const & entry) {
          return fs::is_regular_file(entry.path()) &&
                 std::regex_match(entry.path().filename().string(), rx);

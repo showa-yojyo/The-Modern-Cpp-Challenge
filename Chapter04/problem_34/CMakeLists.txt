@@ -1,5 +1,16 @@
-cmake_minimum_required (VERSION 3.7.0) 
+cmake_minimum_required (VERSION 3.7.0)
 project(problem_34)
+
+if (UNIX)
+  message(status "** Setting GCC flags")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1z -fexceptions -g -Wall")
+elseif(WIN32)
+  message(status "** Setting MSVC flags")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc /std:c++latest")
+
+  add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+endif()
+message(status "** CMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS}")
 
 if(BOOST_FILESYSTEM)
    include_directories(${BOOST_INCLUDE_DIR})
@@ -17,7 +28,7 @@ add_executable(problem_34 main.cpp)
 if(BOOST_FILESYSTEM)
    if(UNIX)
       find_package(Boost COMPONENTS system filesystem REQUIRED)
-      
+
       target_link_libraries(problem_34 ${Boost_FILESYSTEM_LIBRARY}
                                        ${Boost_SYSTEM_LIBRARY})
    endif()
@@ -26,9 +37,9 @@ endif()
 add_custom_command(TARGET problem_34 PRE_BUILD
                    COMMAND ${CMAKE_COMMAND} -E copy
                    ${PROJECT_SOURCE_DIR}/sample34.txt $<TARGET_FILE_DIR:problem_34>)
-                   
+
 add_custom_command(TARGET problem_34 PRE_BUILD
                    COMMAND ${CMAKE_COMMAND} -E copy
                    ${PROJECT_SOURCE_DIR}/sample34.txt ${CMAKE_CURRENT_BINARY_DIR})
-                   
+
 set_target_properties (problem_34 PROPERTIES FOLDER "04.Streams")
