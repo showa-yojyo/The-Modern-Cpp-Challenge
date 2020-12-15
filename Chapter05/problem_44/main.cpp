@@ -1,3 +1,4 @@
+// #44 月間カレンダー
 #include <iostream>
 #include <iomanip>
 #include "date.h"
@@ -6,7 +7,7 @@
 unsigned int week_day(int const y, unsigned int const m, unsigned int const d)
 {
    using namespace date;
-   
+
    if(m < 1 || m > 12 || d < 1 || d > 31) return 0;
 
    auto const dt = date::year_month_day{ year{ y }, month{ m }, day{ d } };
@@ -24,7 +25,7 @@ void print_month_calendar(int const y, unsigned int m)
    auto first_day_weekday = week_day(y, m, 1);
    auto last_day = (unsigned int)year_month_day_last(
       year{ y }, month_day_last{ month{ m } }).day();
-   
+
    unsigned int index = 1;
    for (unsigned int day = 1; day < first_day_weekday; ++day, ++index)
    {
@@ -36,7 +37,7 @@ void print_month_calendar(int const y, unsigned int m)
       std::cout
          << std::right << std::setfill(' ') << std::setw(3)
          << day << ' ';
-      if (index++ % 7 == 0) 
+      if (index++ % 7 == 0)
          std::cout << std::endl;
    }
 

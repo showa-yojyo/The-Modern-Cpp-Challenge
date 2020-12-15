@@ -1,6 +1,10 @@
+// #40 二つの日付間の日数
+// インクルードがごっそり欠けているので補う
+
 #include <iostream>
 #include "date.h"
 
+// こちらは左ひく右
 inline int number_of_days(
    int const y1, unsigned int const m1, unsigned int const d1,
    int const y2, unsigned int const m2, unsigned int const d2)
@@ -11,6 +15,7 @@ inline int number_of_days(
       sys_days{ year{ y2 } / month{ m2 } / day{ d2 } }).count();
 }
 
+// こちらは右ひく左
 inline int number_of_days(date::sys_days const & first,
                           date::sys_days const & last)
 {

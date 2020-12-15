@@ -1,3 +1,5 @@
+// #43 複数のタイムゾーンにおける打ち合わせ時間
+// TODO: ビルド不能
 #include <iostream>
 #include <string>
 #include <vector>
@@ -15,7 +17,7 @@ struct user
 
    user(std::string_view name, std::string_view zone)
       : Name{name.data()}, Zone(date::locate_zone(zone.data()))
-   {      
+   {
    }
 };
 
@@ -24,9 +26,9 @@ void print_meeting_times(
    date::zoned_time<Duration, TimeZonePtr> const & time,
    std::vector<user> const & users)
 {
-   std::cout 
+   std::cout
       << std::left << std::setw(15) << std::setfill(' ')
-      << "Local time: " 
+      << "Local time: "
       << time << std::endl;
 
    for (auto const & user : users)
@@ -34,7 +36,7 @@ void print_meeting_times(
       std::cout
          << std::left << std::setw(15) << std::setfill(' ')
          << user.Name
-         << date::zoned_time<Duration, TimeZonePtr>(user.Zone, time) 
+         << date::zoned_time<Duration, TimeZonePtr>(user.Zone, time)
          << std::endl;
    }
 }
@@ -54,7 +56,7 @@ int main()
    date::year_month_day today = date::floor<date::days>(ch::system_clock::now());
 
    auto localtime = date::zoned_time<std::chrono::minutes>(
-      date::current_zone(), 
+      date::current_zone(),
       static_cast<date::local_days>(today) + ch::hours{ h } +ch::minutes{ m });
 
    print_meeting_times(localtime, users);

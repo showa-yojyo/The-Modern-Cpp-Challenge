@@ -1,3 +1,4 @@
+// #42 年間の日と週
 #include <iostream>
 #include "date.h"
 #include "iso_week.h"
@@ -5,7 +6,7 @@
 unsigned int calendar_week(int const y, unsigned int const m, unsigned int const d)
 {
    using namespace date;
-   
+
    if(m < 1 || m > 12 || d < 1 || d > 31) return 0;
 
    auto const dt = date::year_month_day{ year{ y }, month{ m }, day{ d } };
@@ -17,7 +18,7 @@ unsigned int calendar_week(int const y, unsigned int const m, unsigned int const
 int day_of_year(int const y, unsigned int const m, unsigned int const d)
 {
    using namespace date;
-   
+
    if(m < 1 || m > 12 || d < 1 || d > 31) return 0;
 
    return (sys_days{ year{ y } / month{ m } / day{ d } } -
