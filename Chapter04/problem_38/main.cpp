@@ -1,9 +1,11 @@
 // #38 一時ログファイル
-// TODO: 動作確認
 #include <iostream>
 #include <fstream>
 
-// CMake でのパス指定ができない
+// uuid.h:134:13: error: memcpy was not declared in this scope
+// 著者ライブラリーの不具合をここで解消する
+#include <cstring>
+// apt install uuid-dev
 #include "uuid.h"
 
 #ifdef USE_BOOST_FILESYSTEM
