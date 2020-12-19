@@ -1,3 +1,5 @@
+// #53 映画の平均評価
+// ただし両側 5% * 2 を除外せよとある。
 #include <iostream>
 #include <string>
 #include <vector>
@@ -14,13 +16,20 @@ struct movie
 
 double truncated_mean(std::vector<int> values, double const percentage)
 {
+   // 両側 10% を削るにはソートしておく……。
+   // std::nth_element() を二回呼び出す方法が考えられる。
    std::sort(std::begin(values), std::end(values));
 
+   // 5% に相当する個数を求める
    auto remove_count = static_cast<size_t>(values.size() * percentage + 0.5);
 
    values.erase(std::begin(values), std::begin(values) + remove_count);
+   // rbegin() を使う方法もあるかもしれない。
    values.erase(std::end(values) - remove_count, std::end(values));
 
+   // ここから算術平均を計算する
+
+   // 和を求めるだけだから素の accumulate() で十分だろう。
    auto total = std::accumulate(
       std::cbegin(values), std::cend(values),
       0ull,

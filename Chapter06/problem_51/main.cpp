@@ -1,8 +1,10 @@
+// #51 電話番号のリストの変換
 #include <iostream>
 #include <vector>
 #include <string>
 #include <algorithm>
 
+// 前項のものを使う
 bool starts_with(std::string_view str, std::string_view prefix)
 {
    return str.find(prefix) == 0;
@@ -12,12 +14,14 @@ void normalize_phone_numbers(
    std::vector<std::string>& numbers,
    std::string const & countryCode)
 {
+   // transform() の input は cbegin で output は begin なのは覚えておく。
    std::transform(
       std::cbegin(numbers), std::cend(numbers),
       std::begin(numbers),
+      // ひじょうに長いラムダ式だ
       [countryCode](std::string const & number) {
       std::string result;
-      if (number.size() > 0)
+      if (!number.empty())
       {
          if (number[0] == '0')
             result = "+" + countryCode + number.substr(1);
@@ -29,6 +33,7 @@ void normalize_phone_numbers(
             result = "+" + countryCode + number;
       }
 
+      // 典型的な .erase() と remove_if() のコンビネーション
       result.erase(
          std::remove_if(
             std::begin(result), std::end(result),
