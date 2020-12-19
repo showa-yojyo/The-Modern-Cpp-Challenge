@@ -1,7 +1,7 @@
 #include <iostream>
 #include <array>
 #include <sstream>
-#include <assert.h>
+#include <cassert>
 
 // IPv4 アドレスを表すクラス
 class ipv4

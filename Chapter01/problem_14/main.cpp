@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <numeric>
 #include <string_view>
-#include <assert.h>
+#include <cassert>
 
 bool validate_isbn_10(std::string_view isbn)
 {
