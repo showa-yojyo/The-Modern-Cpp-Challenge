@@ -1,3 +1,6 @@
+// #61 並列変換アルゴリズム
+// 並列版 std::transform() を実装するというのが主題だと思われる。
+// そしてそれは標準で提供されている。
 #include <iostream>
 #include <vector>
 #include <array>
@@ -5,8 +8,8 @@
 #include <functional>
 #include <random>
 #include <chrono>
-#include <thread>
-#include <assert.h>
+#include <thread> // CMakeList.txt を書き換える
+#include <cassert>
 
 template <typename T, typename F>
 std::vector<T> alter(std::vector<T> data, F&& f)
@@ -30,22 +33,27 @@ std::vector<T> palter(std::vector<T> data, F&& f)
    else
    {
       std::vector<std::thread> threads;
-      int thread_count = std::thread::hardware_concurrency();
+      // 適当な並行スレッドの個数
+      auto thread_count = std::thread::hardware_concurrency();
       auto first = std::begin(data);
       auto last = first;
       auto size = data.size() / thread_count;
-      for (int i = 0; i < thread_count; ++i)
+      for (decltype(thread_count) i = 0; i < thread_count; ++i)
       {
          first = last;
          last = i == thread_count - 1 ? std::end(data) : first + size;
 
+         // emplace_back() は複数個一気に追加できるのか？
+         //
+         // ラムダ式のキャプチャーに注意
          threads.emplace_back([first, last, &f]() {
             std::transform(first, last, first,
                std::forward<F>(f));
          });
       }
 
-      for (int i = 0; i < thread_count; ++i)
+      // なぜ生の for ループなのかわかるか？
+      for (decltype(thread_count) i = 0; i < thread_count; ++i)
          threads[i].join();
    }
 
@@ -63,11 +71,11 @@ void ptransform(RandomAccessIterator begin, RandomAccessIterator end, F&& f)
    else
    {
       std::vector<std::thread> threads;
-      int thread_count = 10;
+      auto thread_count = 10;
       auto first = begin;
       auto last = first;
       size /= thread_count;
-      for (int i = 0; i < thread_count; ++i)
+      for (decltype(thread_count) i = 0; i < thread_count; ++i)
       {
          first = last;
          if (i == thread_count - 1) last = end;
@@ -78,6 +86,7 @@ void ptransform(RandomAccessIterator begin, RandomAccessIterator end, F&& f)
          });
       }
 
+      // ここも生の for ループになっている。
       for (auto & t : threads) t.join();
    }
 }
@@ -96,7 +105,8 @@ int main()
 {
    const size_t count = 10000000;
    std::vector<int> data(count);
-   
+
+   // テストデータを生成するためだけに乱数と std::generate() を利用する
    std::random_device rd;
    std::mt19937 mt;
    auto seed_data = std::array<int, std::mt19937::state_size> {};
@@ -106,13 +116,13 @@ int main()
    std::uniform_int_distribution<> ud(1, 100);
 
    std::generate_n(std::begin(data), count, [&mt, &ud]() {return ud(mt); });
-   
+
    auto start = std::chrono::system_clock::now();
    auto r1 = alter(data, [](int const e) {return e * e; });
    auto end = std::chrono::system_clock::now();
    auto t1 = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
    std::cout << "time: " << t1.count() << "ms" << std::endl;
-   
+
    start = std::chrono::system_clock::now();
    auto r2 = palter(data, [](int const e) {return e * e; });
    end = std::chrono::system_clock::now();
