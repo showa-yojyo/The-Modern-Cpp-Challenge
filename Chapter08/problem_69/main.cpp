@@ -1,3 +1,5 @@
+// #69 社会保障番号の生成
+// Template Method パターン
 #include <iostream>
 #include <string>
 #include <sstream>
@@ -8,17 +10,19 @@
 #include <memory>
 #include <algorithm>
 #include <numeric>
-#include <assert.h>
 
+// 新式 enum
 enum class sex_type {female, male};
 
+// 抽象基底クラス
 class social_number_generator
 {
 protected:
    virtual int sex_digit(sex_type const sex) const noexcept = 0;
    virtual int next_random(unsigned const year, unsigned const month, unsigned const day) = 0;
    virtual int modulo_value() const noexcept = 0;
-   
+
+   // コンストラクターで乱数を設定
    social_number_generator(int const min, int const max):ud(min, max)
    {
       std::random_device rd;
@@ -27,35 +31,37 @@ protected:
       std::seed_seq seq(std::begin(seed_data), std::end(seed_data));
       eng.seed(seq);
    }
-  
+
 public:
+   // 表に出すメソッドはここにある
    std::string generate(
       sex_type const sex,
       unsigned const year, unsigned const month, unsigned const day)
    {
       std::stringstream snumber;
-      
+
       snumber << sex_digit(sex);
-      
+
       snumber << year << month << day;
-      
+
       snumber << next_random(year, month, day);
-      
+
       auto number = snumber.str();
-      
+
       auto index = number.length();
+      // 怪しいラムダ式
       auto sum = std::accumulate(std::begin(number), std::end(number), 0u,
                                  [&index](unsigned int const s, char const c) {
                                     return s + static_cast<unsigned int>(index-- * (c-'0'));});
-      
+
       auto rest = sum % modulo_value();
       snumber << modulo_value() - rest;
-      
+
       return snumber.str();
    }
-   
+
    virtual ~social_number_generator() {}
-   
+
 protected:
    std::map<unsigned, int> cache;
    std::mt19937 eng;
@@ -76,7 +82,7 @@ protected:
       if(sex == sex_type::female) return 1;
       else return 2;
    }
-   
+
    virtual int next_random(unsigned const year, unsigned const month, unsigned const day) override
    {
       auto key = year * 10000 + month * 100 + day;
@@ -91,7 +97,7 @@ protected:
          }
       }
    }
-   
+
    virtual int modulo_value() const noexcept override
    {
       return 11;
@@ -112,7 +118,7 @@ protected:
       if(sex == sex_type::female) return 9;
       else return 7;
    }
-   
+
    virtual int next_random(unsigned const year, unsigned const month, unsigned const day) override
    {
       auto key = year * 10000 + month * 100 + day;
@@ -127,7 +133,7 @@ protected:
          }
       }
    }
-   
+
    virtual int modulo_value() const noexcept override
    {
       return 11;
@@ -142,16 +148,16 @@ public:
       generators["northeria"] = std::make_unique<northeria_social_number_generator>();
       generators["southeria"] = std::make_unique<southeria_social_number_generator>();
    }
-   
+
    social_number_generator* get_generator(std::string_view country) const
    {
       auto it = generators.find(country.data());
       if(it != std::end(generators))
          return it->second.get();
-      
+
       throw std::runtime_error("invalid country");
    }
-   
+
 private:
    std::map<std::string, std::unique_ptr<social_number_generator>> generators;
 };
@@ -159,12 +165,13 @@ private:
 int main()
 {
    social_number_generator_factory factory;
-   
-   auto sn1 = factory.get_generator("northeria")->generate(sex_type::female, 2017, 12, 25);
-   auto sn2 = factory.get_generator("northeria")->generate(sex_type::female, 2017, 12, 25);
-   auto sn3 = factory.get_generator("northeria")->generate(sex_type::male, 2017, 12, 25);
-   
-   auto ss1 = factory.get_generator("southeria")->generate(sex_type::female, 2017, 12, 25);
-   auto ss2 = factory.get_generator("southeria")->generate(sex_type::female, 2017, 12, 25);
-   auto ss3 = factory.get_generator("southeria")->generate(sex_type::male, 2017, 12, 25);
+   auto northeria = factory.get_generator("northeria");
+   auto sn1 = northeria->generate(sex_type::female, 2017, 12, 25);
+   auto sn2 = northeria->generate(sex_type::female, 2017, 12, 25);
+   auto sn3 = northeria->generate(sex_type::male, 2017, 12, 25);
+
+   auto southeria = factory.get_generator("southeria");
+   auto ss1 = southeria->generate(sex_type::female, 2017, 12, 25);
+   auto ss2 = southeria->generate(sex_type::female, 2017, 12, 25);
+   auto ss3 = southeria->generate(sex_type::male, 2017, 12, 25);
 }

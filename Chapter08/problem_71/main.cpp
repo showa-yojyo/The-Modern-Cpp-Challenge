@@ -1,9 +1,12 @@
+// #71 観察可能なベクトルコンテナ
+// Observer パターン
 #include <iostream>
 #include <string>
 #include <string_view>
 #include <vector>
 #include <algorithm>
 
+// 新式 enum
 enum class collection_action
 {
    add,
@@ -12,6 +15,7 @@ enum class collection_action
    assign
 };
 
+// to_string() を自前で実装する
 std::string to_string(collection_action const action)
 {
    switch(action)
@@ -21,6 +25,8 @@ std::string to_string(collection_action const action)
       case collection_action::clear: return "clear";
       case collection_action::assign: return "assign";
    }
+   // resolve warning control reaches end of non-void function
+   return "";
 }
 
 struct collection_change_notification
@@ -29,6 +35,7 @@ struct collection_change_notification
    std::vector<size_t> item_indexes;
 };
 
+// 通知を希望するオブジェクトの基底クラス
 class collection_observer
 {
 public:
@@ -36,8 +43,9 @@ public:
    virtual ~collection_observer(){}
 };
 
+// コンテナベースの
 template <typename T, class Allocator = std::allocator<T>>
-class observable_vector final
+class observable_vector final // サブクラスを期待しない場合は final と宣言してしまうのがいい。
 {
    typedef typename std::vector<T, Allocator>::size_type size_type;
 public:
@@ -59,15 +67,17 @@ public:
    template<class InputIt>
    observable_vector(InputIt first, InputIt last, const Allocator& alloc = Allocator())
       :data(first, last, alloc){}
-   
+
+   // コピー代入演算子
    observable_vector& operator=(observable_vector const & other)
    {
       if(this != &other)
       {
          data = other.data;
-         
+
          for(auto o : observers)
          {
+            // nullptr を格納させなければいいのに
             if(o != nullptr)
             {
                o->collection_changed({
@@ -77,16 +87,17 @@ public:
             }
          }
       }
-      
+
       return *this;
    }
-   
+
+   // ムーブ代入演算子
    observable_vector& operator=(observable_vector&& other)
    {
       if(this != &other)
       {
          data = std::move(other.data);
-         
+
          for(auto o : observers)
          {
             if(o != nullptr)
@@ -98,14 +109,15 @@ public:
             }
          }
       }
-      
+
       return *this;
    }
-   
+
+   // T&& とあるが完全転送はででこない。テンプレート引数はもう確定している。
    void push_back(T&& value)
    {
       data.push_back(value);
-      
+
       for(auto o : observers)
       {
          if(o != nullptr)
@@ -117,11 +129,11 @@ public:
          }
       }
    }
-   
+
    void pop_back()
    {
       data.pop_back();
-      
+
       for(auto o : observers)
       {
          if(o != nullptr)
@@ -133,44 +145,47 @@ public:
          }
       }
    }
-   
+
+   // 確かに noexcept であるべき操作だが、それが本当に期待できるか？
    void clear() noexcept
    {
       data.clear();
-      
+
       for(auto o : observers)
       {
          if(o != nullptr)
          {
+            // ここで noexcept である必要がある
             o->collection_changed({
                collection_action::clear,
-               std::vector<size_t> {}
+               std::vector<size_t> {} // これが noexcept かどうか
             });
          }
       }
    }
-   
+
    size_type size() const noexcept
    {
       return data.size();
    }
-   
+
+   // empty() を呼び出すときに戻り値をチェックしないということは考えられない。
    [[nodiscard]] bool empty() const noexcept
    {
       return data.empty();
    }
-   
+
    void add_observer(collection_observer * const o)
    {
       observers.push_back(o);
    }
-   
+
    void remove_observer(collection_observer const * const o)
    {
       observers.erase(std::remove(std::begin(observers), std::end(observers), o),
                       std::end(observers));
    }
-   
+
 private:
    std::vector<T, Allocator> data;
    std::vector<collection_observer*> observers;
@@ -196,25 +211,31 @@ int main()
 {
    observable_vector<int> v;
    observer o;
-   
+
    v.add_observer(&o);
-   
+
    v.push_back(1);
    v.push_back(2);
-   
+
    v.pop_back();
-   
+
    v.clear();
-   
+
    v.remove_observer(&o);
-   
+
    v.push_back(3);
    v.push_back(4);
-   
+
    v.add_observer(&o);
-   
+
    observable_vector<int> v2 {1,2,3};
    v = v2;
-   
+
    v = observable_vector<int> {7,8,9};
 }
+// action: add, indexes: 0
+// action: add, indexes: 1
+// action: remove, indexes: 2
+// action: clear
+// action: assign
+// action: assign

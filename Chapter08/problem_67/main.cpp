@@ -1,7 +1,9 @@
+// #67 パスワードの検証
+// Decorator パターン
 #include <string>
 #include <string_view>
 #include <memory>
-#include <assert.h>
+#include <cassert>
 
 class password_validator
 {
@@ -10,39 +12,44 @@ public:
    virtual ~password_validator() {}
 };
 
+// いちおう final 宣言してある
 class length_validator final : public password_validator
 {
 public:
    length_validator(unsigned int min_length):
       length(min_length)
    {}
-   
+
+   // いちおう override を書く。以下同様。
    virtual bool validate(std::string_view password) override
    {
       return password.length() >= length;
    }
-   
+
 private:
    unsigned int length;
 };
 
+// さらなる派生クラスがあるため final 宣言をしない
 class password_validator_decorator : public password_validator
 {
 public:
+   // std::unique_ptr を値渡しで受け取る
    explicit password_validator_decorator(std::unique_ptr<password_validator> validator):
       inner(std::move(validator))
    {
    }
-   
+
    virtual bool validate(std::string_view password) override
    {
       return inner->validate(password);
    }
-   
+
 private:
    std::unique_ptr<password_validator> inner;
 };
 
+// ここからはすべて final クラス
 class digit_password_validator final : public password_validator_decorator
 {
 public:
@@ -50,12 +57,12 @@ public:
    password_validator_decorator(std::move(validator))
    {
    }
-   
+
    virtual bool validate(std::string_view password) override
    {
       if(!password_validator_decorator::validate(password))
          return false;
-      
+
       return password.find_first_of("0123456789") != std::string::npos;
    }
 };
@@ -67,21 +74,21 @@ public:
    password_validator_decorator(std::move(validator))
    {
    }
-   
+
    virtual bool validate(std::string_view password) override
    {
       if(!password_validator_decorator::validate(password))
          return false;
-      
+
       bool haslower = false;
       bool hasupper = false;
-      
+
       for(size_t i = 0; i < password.length() && !(hasupper && haslower); ++i)
       {
          if(islower(password[i])) haslower = true;
          else if(isupper(password[i])) hasupper = true;
       }
-      
+
       return haslower && hasupper;
    }
 };
@@ -93,12 +100,12 @@ public:
    password_validator_decorator(std::move(validator))
    {
    }
-   
+
    virtual bool validate(std::string_view password) override
    {
       if(!password_validator_decorator::validate(password))
          return false;
-      
+
       return password.find_first_of("!@#$%^&*(){}[]?<>") != std::string::npos;
    }
 };
@@ -106,35 +113,37 @@ public:
 int main()
 {
    {
+      // std::make_unique だが、別にヒープ上に作成する必要はないはず。
+      // 以下同様。
       auto validator = std::make_unique<length_validator>(8);
-   
+
       assert(validator->validate("abc123!@#"));
       assert(!validator->validate("abc123"));
    }
-   
+
    {
       auto validator = std::make_unique<digit_password_validator>(
                            std::make_unique<length_validator>(8));
-      
+
       assert(validator->validate("abc123!@#"));
       assert(!validator->validate("abcde!@#"));
    }
-   
+
    {
       auto validator = std::make_unique<case_password_validator>(
                            std::make_unique<digit_password_validator>(
                               std::make_unique<length_validator>(8)));
-      
+
       assert(validator->validate("Abc123!@#"));
       assert(!validator->validate("abc123!@#"));
    }
-   
+
    {
       auto validator = std::make_unique<symbol_password_validator>(
                            std::make_unique<case_password_validator>(
                               std::make_unique<digit_password_validator>(
                                  std::make_unique<length_validator>(8))));
-      
+
       assert(validator->validate("Abc123!@#"));
       assert(!validator->validate("Abc123567"));
    }
