@@ -1,8 +1,10 @@
+// #77 映画のリストを PDF に出力する
 #include <iostream>
 #include <string>
 #include <string_view>
 #include <iomanip>
 
+// サードパーティー製ライブラリー PDF-Writer a.k.a. Hummus を採用
 #include "PDFWriter/PDFWriter.h"
 #include "PDFWriter/PDFPage.h"
 #include "PDFWriter/PageContentContext.h"
@@ -15,7 +17,7 @@ static const std::string fonts_dir = R"(c:\windows\fonts\)";
 #elif defined (__APPLE__)
 static const std::string fonts_dir = R"(/Library/Fonts/)";
 #else
-static const std::string fonts_dir = R"(/usr/share/fonts)";   
+static const std::string fonts_dir = R"(/usr/share/fonts)";
 #endif
 
 void print_pdf(
