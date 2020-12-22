@@ -1,9 +1,11 @@
+// #79 Zip アーカイブにあるファイルを探し出す
 #include <iostream>
 #include <string>
 #include <string_view>
 #include <vector>
 #include <regex>
 
+// 今回は ZipLib を採用
 #include "ZipFile.h"
 #include "ZipArchive.h"
 
@@ -26,29 +28,27 @@ std::vector<std::string> find_in_archive(
 {
    std::vector<std::string> results;
 
-   if (fs::exists(archivepath))
+   if (fs::exists(archivepath)) // このテストは本質的には不要
    {
       try
       {
+         // Zip ファイルを「開く」
          auto archive = ZipFile::Open(archivepath.string());
 
+         // ZipLib のインターフェイスがダサい
          for (size_t i = 0; i < archive->GetEntriesCount(); ++i)
          {
-            auto entry = archive->GetEntry(i);
-            if (entry)
+            if (auto entry = archive->GetEntry(i); !entry->IsDirectory())
             {
-               if (!entry->IsDirectory())
+               auto name = entry->GetName();
+               if (std::regex_match(name, std::regex{ pattern.data() }))
                {
-                  auto name = entry->GetName();
-                  if (std::regex_match(name, std::regex{ pattern.data() }))
-                  {
-                     results.push_back(entry->GetFullName());
-                  }
+                  results.push_back(entry->GetFullName());
                }
             }
          }
       }
-      catch (std::exception const & ex)
+      catch (std::exception const & ex) // ここをまともに書き直す
       {
          std::cout << ex.what() << std::endl;
       }

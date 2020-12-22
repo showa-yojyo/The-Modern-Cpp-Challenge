@@ -1,3 +1,4 @@
+// #87 SQLite データベースで映画の画像を扱う
 #include <iostream>
 #include <vector>
 #include <string>
@@ -27,6 +28,8 @@ using std::optional;
 
 #include "sqlite3.h"
 
+// あるフィールドが NULL である場合に std::optional を利用したい。
+// sqlite_modern_cpp がそれを有効とするようにこのマクロを定義する。
 #define MODERN_SQLITE_STD_OPTIONAL_SUPPORT
 #include "sqlite_modern_cpp.h"
 #include "movies.h"
@@ -67,9 +70,10 @@ bool add_media(sqlite_int64 const movieid,
          << name.data()
          << description.data()
          << content;
-         
+
       return true;
    }
+   // さらに雑な例外処理
    catch (...) { return false; }
 }
 
@@ -80,8 +84,8 @@ media_list get_media(sqlite_int64 const movieid,
 
    db << "select rowid, * from media where movieid = ?;"
       << movieid
-      >> [&list](sqlite_int64 const rowid, 
-            sqlite_int64 const movieid, 
+      >> [&list](sqlite_int64 const rowid,
+            sqlite_int64 const movieid,
             std::string const & name,
 #ifdef USE_BOOST_OPTIONAL
             std::unique_ptr<std::string> const text,
@@ -166,7 +170,7 @@ void run_find(std::string_view line, sqlite::database & db)
 
    auto movies = get_movies(title, db);
    if(movies.empty())
-      std::cout << "empty" << std::endl;      
+      std::cout << "empty" << std::endl;
    else
    {
       for (auto const m : movies)
@@ -178,7 +182,7 @@ void run_find(std::string_view line, sqlite::database & db)
             << m.length << "min"
             << std::endl;
       }
-   }      
+   }
 }
 
 void run_list(std::string_view line, sqlite::database & db)
@@ -246,6 +250,7 @@ void run_del(std::string_view line, sqlite::database & db)
       std::cout << "input error" << std::endl;
 }
 
+// ここは凝らない
 void print_commands()
 {
    std::cout

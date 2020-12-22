@@ -1,3 +1,5 @@
+// #82 国旗を表す PNG を作る
+// C++ の新機能学習という意味ではこれまでのものよりつまらない。
 #include <iostream>
 #include <string_view>
 #include <string>
@@ -24,7 +26,7 @@ int main()
    int width = 0, height = 0;
    std::string filepath;
 
-   std::cout << "Width: "; 
+   std::cout << "Width: ";
    std::cin >> width;
 
    std::cout << "Heigh: ";

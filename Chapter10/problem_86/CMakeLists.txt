@@ -1,5 +1,19 @@
-cmake_minimum_required (VERSION 3.7.0) 
+cmake_minimum_required (VERSION 3.7.0)
 project(problem_86)
+
+if (UNIX)
+  message(status "** Setting GCC flags")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1z -fexceptions -g -Wall")
+elseif(WIN32)
+  message(status "** Setting MSVC flags")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc /std:c++latest")
+
+  add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+endif()
+message(status "** CMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS}")
+
+set(INCLUDE_PATH "${CMAKE_SOURCE_DIR}/../../include")
+set(LIBS_PATH "${CMAKE_SOURCE_DIR}/../../libs")
 
 include_directories(${LIBS_PATH}/sqlite)
 include_directories(${LIBS_PATH}/sqlite_modern_cpp)
@@ -12,11 +26,12 @@ if(BOOST_OPTIONAL)
 endif()
 
 add_executable(problem_86 ${LIBS_PATH}/sqlite/sqlite3.c main.cpp)
+target_link_libraries(problem_86 pthread dl)
 
 add_custom_command(TARGET problem_86 PRE_BUILD
                    COMMAND ${CMAKE_COMMAND} -E copy
                    ${PROJECT_SOURCE_DIR}/cppchallenger86.db $<TARGET_FILE_DIR:problem_86>)
-                   
+
 add_custom_command(TARGET problem_86 PRE_BUILD
                    COMMAND ${CMAKE_COMMAND} -E copy
                    ${PROJECT_SOURCE_DIR}/cppchallenger86.db ${CMAKE_CURRENT_BINARY_DIR})

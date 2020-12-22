@@ -1,8 +1,11 @@
+// #85 SQLite データベースから映画を読み込む
 #include <iostream>
 #include <vector>
 
 #include "sqlite3.h"
+// C++17 と SQLCipher をサポートする sqlite_modern_cpp を採用。
 #include "sqlite_modern_cpp.h"
+// 自作ヘッダーファイル
 #include "movies.h"
 
 void print_movie(movie const & m)
@@ -21,28 +24,31 @@ void print_movie(movie const & m)
    std::cout << std::endl << std::endl;
 }
 
-std::vector<std::string> get_directors(sqlite3_int64 const movie_id, 
+std::vector<std::string> get_directors(sqlite3_int64 const movie_id,
                                        sqlite::database & db)
 {
    std::vector<std::string> result;
-   db << R"(select p.name from directors as d 
-            join persons as p on d.personid = p.rowid 
+
+   // この operator<<() と operator>>() の使われ方は面白い
+   db << R"(select p.name from directors as d
+            join persons as p on d.personid = p.rowid
             where d.movieid = ?;)"
       << movie_id
       >> [&result](std::string const name)
    {
+      // 今まであまり見かけなかった emplate_back()
       result.emplace_back(name);
    };
 
    return result;
 }
 
-std::vector<std::string> get_writers(sqlite3_int64 const movie_id, 
+std::vector<std::string> get_writers(sqlite3_int64 const movie_id,
                                      sqlite::database & db)
 {
    std::vector<std::string> result;
    db << R"(select p.name from writers as w
-         join persons as p on w.personid = p.rowid 
+         join persons as p on w.personid = p.rowid
          where w.movieid = ?;)"
       << movie_id
       >> [&result](std::string const name)
@@ -53,7 +59,7 @@ std::vector<std::string> get_writers(sqlite3_int64 const movie_id,
    return result;
 }
 
-std::vector<casting_role> get_cast(sqlite3_int64 const movie_id, 
+std::vector<casting_role> get_cast(sqlite3_int64 const movie_id,
                                    sqlite::database & db)
 {
    std::vector<casting_role> result;
@@ -74,7 +80,7 @@ movie_list get_movies(sqlite::database & db)
    movie_list movies;
 
    db << R"(select rowid, * from movies;)"
-      >> [&movies, &db](sqlite3_int64 const rowid, std::string const & title, 
+      >> [&movies, &db](sqlite3_int64 const rowid, std::string const & title,
                         int const year, int const length)
    {
       movies.emplace_back(movie{
@@ -95,6 +101,7 @@ int main()
 {
    try
    {
+      // このデータベースは cmake の段階で作成する
       sqlite::database db(R"(cppchallenger85.db)");
 
       auto movies = get_movies(db);
@@ -111,3 +118,12 @@ int main()
       std::cerr << e.what() << std::endl;
    }
 }
+// [1] The Matrix (1999) 196min
+//  directed by: Lana Wachowski,Lilly Wachowski,
+//  written by: Lana Wachowski,Lilly Wachowski,
+//  cast: Keanu Reeves (Neo),Laurence Fishburne (Morpheus),Carrie-Anne Moss (Trinity),Hugo Weaving (Agent Smith),
+//
+// [2] Forrest Gump (1994) 202min
+//  directed by: Robert Zemeckis,
+//  written by: Robert Zemeckis,
+//  cast: Tom Hanks (Forrest Gump),Sally Field (Mrs. Gump),Robin Wright (Jenny Curran),Mykelti Williamson (Bubba Blue),

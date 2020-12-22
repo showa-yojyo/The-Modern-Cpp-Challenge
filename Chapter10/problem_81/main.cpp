@@ -1,3 +1,4 @@
+// #81 パスワード付き Zip アーカイブ
 #include <iostream>
 #include <string>
 #include <string_view>
@@ -28,6 +29,8 @@ void compress(
    if (fs::is_regular_file(source))
    {
       if (reporter) reporter("Compressing " + source.string());
+
+      // 前項とここが異なる
       ZipFile::AddEncryptedFile(
          archive.string(),
          source.string(),
@@ -50,6 +53,7 @@ void compress(
          }
          else if (fs::is_regular_file(p))
          {
+            // 前項とここが異なる
             ZipFile::AddEncryptedFile(
                archive.string(),
                p.path().string(),
@@ -86,12 +90,12 @@ void decompress(
 
    for (size_t i = 0; i < zipArchive->GetEntriesCount(); ++i)
    {
-      auto entry = zipArchive->GetEntry(i);
-      if (entry)
+      if (auto entry = zipArchive->GetEntry(i))
       {
          auto filepath = destination / fs::path{ entry->GetFullName() }.relative_path();
          if (reporter) reporter("Creating " + filepath.string());
 
+         // 前項とここが異なる
          if (entry->IsPasswordProtected())
             entry->SetPassword(password.data());
 
@@ -114,8 +118,7 @@ void decompress(
                   reporter("Cannot create destination file!");
             }
 
-            auto dataStream = entry->GetDecompressionStream();
-            if (dataStream)
+            if (auto dataStream = entry->GetDecompressionStream())
             {
                utils::stream::copy(*dataStream, destFile);
             }

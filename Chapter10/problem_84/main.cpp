@@ -1,10 +1,11 @@
+// #84 EAN-13 バーコード
 #include <iostream>
 #include <string_view>
 #include <array>
 #include <algorithm>
 #include <numeric>
 #include <bitset>
-#include <assert.h>
+#include <cassert>
 
 #include "pngwriter.h"
 
@@ -38,7 +39,7 @@ public:
          result[i] = static_cast<unsigned char>(number[i] - '0');
       return result;
    }
-   
+
    std::string to_string() const noexcept
    {
       return number;
@@ -49,6 +50,7 @@ private:
    {
       unsigned char weights[12] = { 1,3,1,3,1,3,1,3,1,3,1,3 };
       size_t index = 0;
+      // ラムダ式にはもう慣れたか？
       auto sum = std::accumulate(
          std::begin(code), std::end(code), 0,
          [&weights, &index](int const total, char const c) {
@@ -164,8 +166,8 @@ int main()
    ean13_barcode_generator generator;
 
    generator.create(
-      ean13("8711253001202"), 
-      "8711253001202.png", 
+      ean13("8711253001202"),
+      "8711253001202.png",
       5, 150, 30);
 
    generator.create(
