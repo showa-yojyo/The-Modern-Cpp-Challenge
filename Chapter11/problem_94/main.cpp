@@ -1,6 +1,10 @@
+// #94 ファイル署名
+// RSA 暗号を用いてファイルに署名、改ざんがないことを検証する。
+//
+// C++ の学習としては面白くない
 #include <iostream>
 #include <string>
-#include <assert.h>
+#include <cassert>
 
 #include "rsa.h"
 #include "aes.h"
@@ -90,6 +94,7 @@ void rsa_sign_file(
    CryptoPP::RSA::PrivateKey privateKey;
    decode_private_key(privateKeyPath, privateKey);
 
+   // 署名関数
    CryptoPP::RSASSA_PKCS1v15_SHA_Signer signer(privateKey);
 
    CryptoPP::FileSource fileSource(
@@ -110,6 +115,7 @@ bool rsa_verify_file(
    CryptoPP::RSA::PublicKey publicKey;
    decode_public_key(publicKeyPath.c_str(), publicKey);
 
+   // 検証器
    CryptoPP::RSASSA_PKCS1v15_SHA_Verifier verifier(publicKey);
 
    CryptoPP::FileSource signatureFile(
@@ -133,6 +139,7 @@ bool rsa_verify_file(
    return verifierFilter->GetLastResult();
 }
 
+// 3072bit の RSA 公開鍵・秘密鍵のペアを生成する
 void generate_keys(
    fs::path const & privateKeyPath,
    fs::path const & publicKeyPath,
@@ -158,17 +165,20 @@ int main()
 {
    CryptoPP::AutoSeededRandomPool rng;
 
+   // とりあえずプログラム開始時にランダムに鍵を生成する。
    generate_keys(
       "rsa-private.key",
       "rsa-public.key",
       rng);
 
+   // 秘密鍵でファイルに署名する。
    rsa_sign_file(
       "sample.txt",
       "rsa-private.key",
       "sample.sign",
       rng);
 
+   // 公開鍵と署名したファイルでファイルを検証する。
    auto success = rsa_verify_file(
       "sample.txt",
       "rsa-public.key",

@@ -8,6 +8,8 @@ sample.pdf
 test.png
 Chapter10/problem_83/validation.png
 Chapter10/problem_84/*.png
+Chapter11/problem_94/rsa-*.key
+Chapter11/problem_94/sample.sign
 
 # Cmake files
 CMakeLists.txt.user

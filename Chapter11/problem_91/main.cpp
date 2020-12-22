@@ -1,9 +1,11 @@
+// #91 資格情報を検証する
 #include <iostream>
 #include <string>
 #include <string_view>
 #include <iomanip>
 #include <vector>
 
+// Crypto++
 #include "sha.h"
 #include "hex.h"
 
@@ -16,6 +18,7 @@ struct user
    std::string lastname;
 };
 
+// パスワードを SHA512 ハッシュ値に変換して返す
 std::string get_hash(std::string_view password)
 {
    CryptoPP::SHA512 sha;
@@ -67,7 +70,7 @@ int main()
    auto hash = get_hash(password);
 
    auto pos = std::find_if(
-      std::begin(users), std::end(users),
+      std::cbegin(users), std::cend(users),
       [username, hash](user const & u) {
       return u.username == username &&
          u.password == hash; });

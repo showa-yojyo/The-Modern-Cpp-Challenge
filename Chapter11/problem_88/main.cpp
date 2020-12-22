@@ -1,7 +1,11 @@
+// #88 シーザー暗号
+// 簡単のために大文字しか処理しない
+//
+// C++ 新機能の学習には不向き
 #include <iostream>
 #include <string>
 #include <string_view>
-#include <assert.h>
+#include <cassert>
 
 std::string caesar_encrypt(std::string_view text, int const shift)
 {

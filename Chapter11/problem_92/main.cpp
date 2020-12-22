@@ -1,3 +1,4 @@
+// #92 ファイルのハッシュを計算する
 #include <iostream>
 #include <string>
 #include <fstream>
@@ -59,6 +60,7 @@ std::string compute_hash(fs::path const & filepath)
       return result;
    }
 
+   // もっと上の方に書いて欲しい
    throw std::runtime_error("Cannot open file!");
 }
 

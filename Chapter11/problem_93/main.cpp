@@ -1,3 +1,5 @@
+// #93 ファイルの暗号化と復号
+// C++ の学習としては面白くない
 #include <iostream>
 #include <string>
 #include <string_view>
