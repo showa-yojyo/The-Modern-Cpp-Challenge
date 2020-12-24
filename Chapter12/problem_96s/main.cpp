@@ -1,11 +1,18 @@
+// #96 クライアント・サーバー Fizz-Buzz (server side)
 #include <iostream>
 #include <string>
+// なぜか抜けているので補足
+#include <array>
+#include <memory>
 
+// 前項参照
 #define ASIO_STANDALONE
 #include "asio.hpp"
 
+// 本書の説明 (p. 257) 参照
 std::string fizzbuzz(int const number)
 {
+   // コードを見ればわかるか
    if (number != 0)
    {
       auto m3 = number % 3;
@@ -18,10 +25,13 @@ std::string fizzbuzz(int const number)
    return std::to_string(number);
 }
 
+// std::enable_shared_from_this は説明を要する。
+// これを継承するサブクラスは、メンバー関数内で shared_from_this() により
+// サブクラス自身の std::shared_ptr オブジェクトを得る。
 class session : public std::enable_shared_from_this<session>
 {
 public:
-   session(asio::ip::tcp::socket socket) : 
+   session(asio::ip::tcp::socket socket) :
       tcp_socket(std::move(socket))
    {
    }
@@ -34,8 +44,11 @@ public:
 private:
    void read()
    {
+      // これが std::shared_ptr<sesson> 型となる
       auto self(shared_from_this());
 
+      // ソケット操作
+      // ラムダ式でインラインに処理を定義する。
       tcp_socket.async_read_some(
          asio::buffer(data, data.size()),
          [this, self](std::error_code const ec, std::size_t const length)
@@ -43,6 +56,7 @@ private:
          if (!ec)
          {
             auto number = std::string(data.data(), length);
+            // この atoi() はダサい気がする
             auto result = fizzbuzz(std::atoi(number.c_str()));
 
             std::cout << number << " -> " << result << std::endl;
@@ -56,6 +70,7 @@ private:
    {
       auto self(shared_from_this());
 
+      // ソケット操作
       tcp_socket.async_write_some(
          asio::buffer(response.data(), response.length()),
          [this, self](std::error_code const ec, std::size_t const)
@@ -67,7 +82,8 @@ private:
       });
    }
 
-   std::array<char, 1024>  data;
+   // メンバー変数
+   std::array<char, 1024>  data; // std::array のよい利用例と思われる
    asio::ip::tcp::socket   tcp_socket;
 };
 
@@ -101,14 +117,13 @@ private:
    asio::ip::tcp::socket   tcp_socket;
 };
 
+// Ctrl+C するまで稼働し続ける
 void run_server(short const port)
 {
    try
    {
       asio::io_context context;
-
       server srv(context, port);
-
       context.run();
    }
    catch (std::exception const & e)

@@ -1,3 +1,5 @@
+// #99 テキストを任意の言語に翻訳する
+// このコードから Unicode の扱い方を学べる
 #include <iostream>
 #include <string>
 #include <string_view>
@@ -9,10 +11,12 @@
 #include <vector>
 #include <tuple>
 
+// 前項参照
 #include "curl_easy.h"
 #include "curl_exception.h"
 #include "curl_header.h"
 
+// 文字コード変換関数の実装例
 std::wstring utf8_to_utf16(std::string_view text)
 {
    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
@@ -20,6 +24,7 @@ std::wstring utf8_to_utf16(std::string_view text)
    return wtext;
 }
 
+// 文字コード変換関数の実装例
 std::string utf16_to_utf8(std::wstring_view wtext)
 {
    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
@@ -30,18 +35,19 @@ std::string utf16_to_utf8(std::wstring_view wtext)
 class text_translator
 {
 public:
-   text_translator(std::string_view endpoint, 
-                   std::string_view key) 
+   text_translator(std::string_view endpoint,
+                   std::string_view key)
       : endpoint(endpoint), app_key(key)
    {}
 
    std::wstring translate_text(
-      std::wstring_view wtext, 
+      std::wstring_view wtext,
       std::string_view to,
       std::string_view from = "en")
    {
       try
       {
+         // operator""s を使用
          using namespace std::string_literals;
 
          std::stringstream str;
@@ -52,6 +58,8 @@ public:
 
          curl::curl_header header;
          header.add("Ocp-Apim-Subscription-Key:" + app_key);
+
+         // GET リクエストを構成する
 
          easy.escape(text);
          auto url = endpoint + "/Translate";
@@ -81,6 +89,7 @@ public:
    }
 
 private:
+   // これはよくある正規表現の使い方
    std::string deserialize_result(std::string_view text)
    {
       std::regex rx(R"(<string.*>(.*)<\/string>)");
@@ -113,9 +122,11 @@ int main()
 
    set_utf8_conversion(std::wcout);
 
+   // Microsoft Azure の Cognitive Services を使うとのこと
+   // Text Translate API
    text_translator tt(
       "https://api.microsofttranslator.com/V2/Http.svc",
-      "...(your api key)...");
+      "...(your api key)..."); // したがってアカウントを sign up する必要がある
 
    std::vector<std::tuple<std::wstring, std::string, std::string>> texts
    {
@@ -128,7 +139,7 @@ int main()
    {
       auto result = tt.translate_text(text, to, from);
 
-      std::cout << from << ": "; 
+      std::cout << from << ": ";
       std::wcout << text << std::endl;
       std::cout << to << ": ";
       std::wcout << result << std::endl;

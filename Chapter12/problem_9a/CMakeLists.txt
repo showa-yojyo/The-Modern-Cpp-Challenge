@@ -1,22 +1,36 @@
-cmake_minimum_required (VERSION 3.7.0) 
+cmake_minimum_required (VERSION 3.7.0)
 project(problem_9a)
 
+if (UNIX)
+  message(status "** Setting GCC flags")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1z -fexceptions -g -Wall")
+elseif(WIN32)
+  message(status "** Setting MSVC flags")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc /std:c++latest")
+
+  add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+endif()
+message(status "** CMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS}")
+
 add_definitions(-DCURL_STATICLIB)
+
+set(INCLUDE_PATH "${CMAKE_SOURCE_DIR}/../../include")
+set(LIBS_PATH "${CMAKE_SOURCE_DIR}/../../libs")
 
 include_directories(${LIBS_PATH}/nlohmannjson)
 include_directories(${LIBS_PATH}/curl/include)
 include_directories(${LIBS_PATH}/curlcpp/include)
+link_directories(${LIBS_PATH}/curlcpp/build/src)
 
 add_executable(problem_9a main.cpp)
 
-target_link_libraries(problem_9a libcurl)
-target_link_libraries(problem_9a curlcpp)
+target_link_libraries(problem_9a curl curlcpp)
 
 if (UNIX)
    link_directories(${CURLCPP_LIB_LOCATION})
-elseif(WIN32) 
+elseif(WIN32)
    target_link_libraries(problem_9a Crypt32.lib ws2_32.lib winmm.lib wldap32.lib)
-endif() 
+endif()
 
 add_custom_command(TARGET problem_9a PRE_BUILD
                    COMMAND ${CMAKE_COMMAND} -E copy_directory
@@ -25,5 +39,5 @@ add_custom_command(TARGET problem_9a PRE_BUILD
 add_custom_command(TARGET problem_9a PRE_BUILD
                    COMMAND ${CMAKE_COMMAND} -E copy_directory
                    ${PROJECT_SOURCE_DIR}/res ${CMAKE_CURRENT_BINARY_DIR}/res)
-                   
+
 set_target_properties (problem_9a PROPERTIES FOLDER "12.NetworkingCloud")

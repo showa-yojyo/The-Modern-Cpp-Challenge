@@ -1,7 +1,10 @@
+// #98 IMAP を使って電子メールを取得
 #include <iostream>
 #include <string>
 #include <string_view>
 
+// IMAPS (IMAP over SSL) を使っているメールサーバーに HTTP リクエストを行うので
+// libcurl を採用するとのこと。
 #include "curl_easy.h"
 #include "curl_exception.h"
 
@@ -158,3 +161,13 @@ int main()
 
    return 0;
 }
+// 自分のアカウントに置き換えて実行したが、結局ダメ：
+//
+// ERROR: Login denied ::::: FUNCTION: perform
+//
+// ERROR: Login denied ::::: FUNCTION: perform
+// ERROR: Login denied ::::: FUNCTION: perform
+//
+// ERROR: Login denied ::::: FUNCTION: perform
+// ERROR: Login denied ::::: FUNCTION: perform
+// ERROR: Login denied ::::: FUNCTION: perform
