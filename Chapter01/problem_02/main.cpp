@@ -1,12 +1,13 @@
+// #2 最大公約数
 #include <iostream>
 #include <numeric>
 
-unsigned int gcd(unsigned int const a, unsigned int const b)
+constexpr unsigned int gcd(unsigned int a, unsigned int b) noexcept
 {
    return b == 0 ? a : gcd(b, a % b);
 }
 
-unsigned int gcd2(unsigned int a, unsigned int b)
+constexpr unsigned int gcd2(unsigned int a, unsigned int b) noexcept
 {
    while (b != 0)
    {

@@ -1,15 +1,16 @@
+// #10 グレイコード
 // 馴染みのない符号なのでよくわからない
 #include <iostream>
 #include <bitset>
 #include <string>
 
-unsigned int gray_encode(unsigned int const num)
+constexpr unsigned int gray_encode(unsigned int num) noexcept
 {
    return num ^ (num >> 1);
 }
 
 // 復号
-unsigned int gray_decode(unsigned int gray)
+constexpr unsigned int gray_decode(unsigned int gray) noexcept
 {
    // 上位ケタから下位ケタに向かって走査
    for (unsigned int bit = 1U << 31; bit > 1; bit >>= 1)
@@ -20,10 +21,10 @@ unsigned int gray_decode(unsigned int gray)
 }
 
 // 書式化のために std::bitset を援用する
-std::string to_binary(unsigned int value, int const digits)
+std::string to_binary(unsigned int value, int digits)
 {
    // std::bitset::to_string() を習得すること
-   return std::bitset<32>(value).to_string().substr(32-digits, digits);
+   return std::bitset<32>(value).to_string().substr(32 - digits, digits);
 }
 
 int main()

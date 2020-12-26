@@ -1,13 +1,14 @@
+// #12 最長コラッツ数列
 #include <iostream>
 #include <vector>
 
 // いつものように long long に注意
-std::pair<unsigned long long, long> longest_collatz_uncached(unsigned long long const limit)
+auto longest_collatz_uncached(unsigned long long limit) -> std::pair<decltype(limit), long>
 {
    long length = 0;
-   unsigned long long number = 0;
+   decltype(limit) number = 0;
 
-   for (unsigned long long i = 2; i <= limit; i++)
+   for (decltype(limit) i = 2; i <= limit; i++)
    {
       auto n = i;
       long steps = 0;
@@ -30,14 +31,14 @@ std::pair<unsigned long long, long> longest_collatz_uncached(unsigned long long 
    return std::make_pair(number, length);
 }
 
-std::pair<unsigned long long, long> longest_collatz(unsigned long long const limit)
+auto longest_collatz(unsigned long long limit) -> std::pair<decltype(limit), long>
 {
    long length = 0;
-   unsigned long long number = 0;
+   decltype(limit) number = 0;
 
    std::vector<int> cache(limit + 1, 0);
 
-   for (unsigned long long i = 2; i <= limit; i++)
+   for (decltype(limit) i = 2; i <= limit; i++)
    {
       auto n = i;
       long steps = 0;

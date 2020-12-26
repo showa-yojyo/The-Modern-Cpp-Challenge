@@ -1,3 +1,4 @@
+// #11 ローマ数字に変換
 // よくあるローマ数字変換の演習問題
 #include <iostream>
 #include <string>
@@ -6,7 +7,7 @@
 std::string to_roman(unsigned int value)
 {
    // .second は std::string でいいと思う
-   std::vector<std::pair<unsigned int, char const*>> roman
+   std::vector<std::pair<decltype(value), char const*>> roman
    {
       { 1000, "M" },{ 900, "CM" },
       { 500, "D" },{ 400, "CD" },
@@ -33,7 +34,7 @@ std::string to_roman(unsigned int value)
 
 int main()
 {
-   for(int i = 1; i <= 100; ++i)
+   for(auto i = 1; i <= 100; ++i)
    {
       std::cout << i << "\t" << to_roman(i) << std::endl;
    }

@@ -1,3 +1,4 @@
+// #13 円周率の計算
 // モンテカルロ法による円周率の近似
 #include <iostream>
 #include <random>
@@ -32,7 +33,7 @@ int main()
    auto seed_data = std::array<int, std::mt19937::state_size> {};
    std::generate(std::begin(seed_data), std::end(seed_data), std::ref(rd));
    // 本書では cbegin/cend
-   std::seed_seq seq(std::begin(seed_data), std::end(seed_data));
+   std::seed_seq seq(std::cbegin(seed_data), std::cend(seed_data));
    auto eng = std::mt19937{ seq };
    auto dist = std::uniform_real_distribution<>{ 0, 1 };
 
