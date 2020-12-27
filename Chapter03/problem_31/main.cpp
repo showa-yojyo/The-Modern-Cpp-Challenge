@@ -7,7 +7,7 @@
 std::string transform_date(std::string_view text)
 {
    // キャプチャーグループに名前をつけたい
-   auto rx = std::regex{ R"((\d{1,2})(\.|-|/)(\d{1,2})(\.|-|/)(\d{4}))" };
+   std::regex rx{ R"((\d{1,2})(\.|-|/)(\d{1,2})(\.|-|/)(\d{4}))" };
    return std::regex_replace(text.data(), rx, R"($5-$3-$1)");
 }
 

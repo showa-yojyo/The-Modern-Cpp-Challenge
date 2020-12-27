@@ -17,7 +17,7 @@ tstring<Elem> capitalize(tstring<Elem> const & text)
 {
    tstringstream<Elem> result;
 
-   bool newWord = true;
+   auto newWord = true;
    for (auto const ch : text)
    {
       // 単語の先頭かそれ以外かで分岐したい。

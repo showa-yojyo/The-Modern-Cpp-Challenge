@@ -12,7 +12,7 @@ template <class Elem>
 using tstringstream = std::basic_stringstream<Elem, std::char_traits<Elem>, std::allocator<Elem>>;
 
 template<typename Elem>
-inline std::vector<tstring<Elem>> split(tstring<Elem> text, Elem const delimiter)
+std::vector<tstring<Elem>> split(tstring<Elem> text, Elem const delimiter)
 {
    auto sstr = tstringstream<Elem>{ text };
    auto tokens = std::vector<tstring<Elem>>{};
@@ -26,7 +26,7 @@ inline std::vector<tstring<Elem>> split(tstring<Elem> text, Elem const delimiter
 }
 
 template<typename Elem>
-inline std::vector<tstring<Elem>> split(tstring<Elem> text, tstring<Elem> const & delimiters)
+std::vector<tstring<Elem>> split(tstring<Elem> text, tstring<Elem> const & delimiters)
 {
    auto tokens = std::vector<tstring<Elem>>{};
 

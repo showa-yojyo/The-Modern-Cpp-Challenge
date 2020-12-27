@@ -7,7 +7,7 @@
 #include <cassert>
 #include <stdexcept>
 
-unsigned char hexchar_to_int(char ch)
+constexpr unsigned char hexchar_to_int(char ch)
 {
    if (ch >= '0' && ch <= '9') return ch - '0';
    if (ch >= 'A' && ch <= 'F') return ch - 'A' + 10;

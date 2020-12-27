@@ -26,8 +26,7 @@ std::string bytes_to_hexstr(C const & c, bool uppercase = false)
 int main()
 {
    std::vector<unsigned char> v{ 0xBA, 0xAD, 0xF0, 0x0D };
-   // 中括弧を入れ子にする必要がある？
-   std::array<unsigned char, 6> a{{ 1,2,3,4,5,6 }};
+   std::array<unsigned char, 6> a{ 1,2,3,4,5,6 };
    unsigned char buf[5] = {0x11, 0x22, 0x33, 0x44, 0x55};
 
    assert(bytes_to_hexstr(v, true) == "BAADF00D");
