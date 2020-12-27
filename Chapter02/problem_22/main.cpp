@@ -1,15 +1,17 @@
-// さまざまな温度単位のリテラル
+// #22 さまざまな温度単位のリテラル
 #include <cmath>
 #include <cassert>
 
 // よくあるトレランス付き比較
-bool are_equal(double const d1, double const d2, double const epsilon = 0.001)
+constexpr bool are_equal(double d1, double d2, double epsilon = 0.001) noexcept
 {
    return std::fabs(d1 - d2) < epsilon;
 }
 
+// 唐突な名前空間
 namespace temperature
 {
+   // 新式 enum
    enum class scale
    {
       celsius,
@@ -17,51 +19,53 @@ namespace temperature
       kelvin
    };
 
+   // クラステンプレート
    template <scale S>
    class quantity
    {
-      const double amount;
+      const double amount; // const メンバー変数
    public:
-      constexpr explicit quantity(double const a) : amount(a) {}
+      // この explicit は従来の C++ にもあるが、
+      constexpr explicit quantity(double a) : amount(a) {}
 
-      // 変換演算子に explicit を付けられる
-      explicit operator double() const { return amount; }
+      // 変換演算子にも explicit を付けられるようになった。
+      constexpr explicit operator double() const noexcept { return amount; }
    };
 
    // 同じ単位同士の比較演算
 
    template <scale S>
-   inline bool operator==(quantity<S> const & lhs, quantity<S> const & rhs)
+   inline bool operator==(quantity<S> const & lhs, quantity<S> const & rhs) noexcept
    {
       return are_equal(static_cast<double>(lhs), static_cast<double>(rhs));
    }
 
    template <scale S>
-   inline bool operator!=(quantity<S> const & lhs, quantity<S> const & rhs)
+   inline bool operator!=(quantity<S> const & lhs, quantity<S> const & rhs) noexcept
    {
       return !(lhs == rhs);
    }
 
    template <scale S>
-   inline bool operator< (quantity<S> const & lhs, quantity<S> const & rhs)
+   inline bool operator< (quantity<S> const & lhs, quantity<S> const & rhs) noexcept
    {
       return static_cast<double>(lhs) < static_cast<double>(rhs);
    }
 
    template <scale S>
-   inline bool operator> (quantity<S> const & lhs, quantity<S> const & rhs)
+   inline bool operator> (quantity<S> const & lhs, quantity<S> const & rhs) noexcept
    {
       return rhs < lhs;
    }
 
    template <scale S>
-   inline bool operator<=(quantity<S> const & lhs, quantity<S> const & rhs)
+   inline bool operator<=(quantity<S> const & lhs, quantity<S> const & rhs) noexcept
    {
       return !(lhs > rhs);
    }
 
    template <scale S>
-   inline bool operator>=(quantity<S> const & lhs, quantity<S> const & rhs)
+   inline bool operator>=(quantity<S> const & lhs, quantity<S> const & rhs) noexcept
    {
       return !(lhs < rhs);
    }
@@ -69,13 +73,13 @@ namespace temperature
    // 同じ単位同士の加減演算
 
    template <scale S>
-   constexpr quantity<S> operator+(quantity<S> const &q1, quantity<S> const &q2)
+   constexpr quantity<S> operator+(quantity<S> const &q1, quantity<S> const &q2) noexcept
    {
       return quantity<S>(static_cast<double>(q1) + static_cast<double>(q2));
    }
 
    template <scale S>
-   constexpr quantity<S> operator-(quantity<S> const &q1, quantity<S> const &q2)
+   constexpr quantity<S> operator-(quantity<S> const &q1, quantity<S> const &q2) noexcept
    {
       return quantity<S>(static_cast<double>(q1) - static_cast<double>(q2));
    }
@@ -86,8 +90,8 @@ namespace temperature
    struct conversion_traits
    {
       // この = delete の利用法はおもしろい。
-      // 特殊化で定義しなくてはならないということか。
-      static double convert(double const value) = delete;
+      // 特殊化それぞれで定義しなくてはならないということか。
+      static double convert(double value) noexcept = delete;
    };
 
    // 以下、異なる単位同士の convert() を実装する。
@@ -95,7 +99,7 @@ namespace temperature
    template <>
    struct conversion_traits<scale::celsius, scale::kelvin>
    {
-      static double convert(double const value)
+      static double convert(double value) noexcept
       {
          return value + 273.15;
       }
@@ -104,7 +108,7 @@ namespace temperature
    template <>
    struct conversion_traits<scale::kelvin, scale::celsius>
    {
-      static double convert(double const value)
+      static double convert(double value) noexcept
       {
          return value - 273.15;
       }
@@ -113,16 +117,16 @@ namespace temperature
    template <>
    struct conversion_traits<scale::celsius, scale::fahrenheit>
    {
-      static double convert(double const value)
+      static double convert(double value) noexcept
       {
-         return (value * 9) / 5 + 32;;
+         return (value * 9) / 5 + 32;
       }
    };
 
    template <>
    struct conversion_traits<scale::fahrenheit, scale::celsius>
    {
-      static double convert(double const value)
+      static double convert(double value) noexcept
       {
          return (value - 32) * 5 / 9;
       }
@@ -131,7 +135,7 @@ namespace temperature
    template <>
    struct conversion_traits<scale::fahrenheit, scale::kelvin>
    {
-      static double convert(double const value)
+      static double convert(double value) noexcept
       {
          return (value + 459.67) * 5 / 9;
       }
@@ -140,7 +144,7 @@ namespace temperature
    template <>
    struct conversion_traits<scale::kelvin, scale::fahrenheit>
    {
-      static double convert(double const value)
+      static double convert(double value) noexcept
       {
          return (value * 9) / 5 - 459.67;
       }
@@ -157,17 +161,17 @@ namespace temperature
    // リテラル演算子を部分名前空間に定義する
    namespace temperature_scale_literals
    {
-      constexpr quantity<scale::celsius> operator "" _deg(long double const amount)
+      constexpr quantity<scale::celsius> operator "" _deg(long double amount) noexcept
       {
          return quantity<scale::celsius> {static_cast<double>(amount)};
       }
 
-      constexpr quantity<scale::fahrenheit> operator "" _f(long double const amount)
+      constexpr quantity<scale::fahrenheit> operator "" _f(long double amount) noexcept
       {
          return quantity<scale::fahrenheit> {static_cast<double>(amount)};
       }
 
-      constexpr quantity<scale::kelvin> operator "" _k(long double const amount)
+      constexpr quantity<scale::kelvin> operator "" _k(long double amount) noexcept
       {
          return quantity<scale::kelvin> {static_cast<double>(amount)};
       }

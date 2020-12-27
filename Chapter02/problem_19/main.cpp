@@ -1,4 +1,4 @@
-// 任意個数の要素をコンテナに追加
+// #19 任意個数の要素をコンテナに追加
 #include <iostream>
 #include <cstdlib>
 #include <vector>
@@ -16,12 +16,14 @@ void push_back(C& c, Args&&... args)
 int main()
 {
    std::vector<int> v;
-   push_back(v, 1, 2, 3, 4);
-   std::copy(std::begin(v), std::end(v),
+   //push_back(v, 1, 2, 3, 4);
+   v.insert(v.end(), {1, 2, 3, 4});
+   std::copy(std::cbegin(v), std::cend(v),
              std::ostream_iterator<int>(std::cout, " "));
 
    std::list<int> l;
-   push_back(l, 1, 2, 3, 4);
-   std::copy(std::begin(l), std::end(l),
+   //push_back(l, 1, 2, 3, 4);
+   l.insert(l.end(), {1, 2, 3, 4});
+   std::copy(std::cbegin(l), std::cend(l),
              std::ostream_iterator<int>(std::cout, " "));
 }

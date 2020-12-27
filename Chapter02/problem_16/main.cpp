@@ -1,3 +1,4 @@
+// #16 範囲内の IPv4 アドレスを列挙する
 // IPv4 の範囲を与えて、該当するものを出力するプログラム
 #include <iostream>
 #include <array>
@@ -6,30 +7,29 @@
 class ipv4
 {
    std::array<unsigned char, 4> data;
+
 public:
-   constexpr ipv4() :data{ { 0 } } {}
+   constexpr ipv4() : data{{0}} {}
    constexpr ipv4(unsigned char const a, unsigned char const b,
-      unsigned char const c, unsigned char const d) :
-      data{ { a,b,c,d } } {}
-   explicit constexpr ipv4(unsigned long a) :
-      data{ { static_cast<unsigned char>((a >> 24) & 0xFF),
-      static_cast<unsigned char>((a >> 16) & 0xFF),
-      static_cast<unsigned char>((a >> 8) & 0xFF),
-      static_cast<unsigned char>(a & 0xFF) } } {}
-   ipv4(ipv4 const & other) noexcept : data(other.data) {}
-   ipv4& operator=(ipv4 const & other) noexcept
+                  unsigned char const c, unsigned char const d) : data{{a, b, c, d}} {}
+   explicit constexpr ipv4(unsigned long a) : data{{static_cast<unsigned char>((a >> 24) & 0xFF),
+                                                    static_cast<unsigned char>((a >> 16) & 0xFF),
+                                                    static_cast<unsigned char>((a >> 8) & 0xFF),
+                                                    static_cast<unsigned char>(a & 0xFF)}} {}
+   ipv4(ipv4 const &other) noexcept : data(other.data) {}
+   ipv4 &operator=(ipv4 const &other) noexcept
    {
       data = other.data;
       return *this;
    }
+   // 以上は前項を参照
 
    constexpr unsigned long to_ulong() const noexcept
    {
-      return
-         (static_cast<unsigned long>(data[0]) << 24) |
-         (static_cast<unsigned long>(data[1]) << 16) |
-         (static_cast<unsigned long>(data[2]) << 8) |
-         static_cast<unsigned long>(data[3]);
+      return (static_cast<unsigned long>(data[0]) << 24) |
+             (static_cast<unsigned long>(data[1]) << 16) |
+             (static_cast<unsigned long>(data[2]) << 8) |
+             static_cast<unsigned long>(data[3]);
    }
 
    std::string to_string() const
@@ -43,6 +43,7 @@ public:
 
    constexpr bool is_loopback() const noexcept
    {
+      // 127.x.x.x はループバックアドレス
       return (to_ulong() & 0xFF000000) == 0x7F000000;
    }
 
@@ -51,6 +52,7 @@ public:
       return to_ulong() == 0;
    }
 
+   // IP アドレスは A, B, C の 3 クラスに分類されると思っておく
    constexpr bool is_class_a() const noexcept
    {
       return (to_ulong() & 0x80000000) == 0;
@@ -74,13 +76,13 @@ public:
    // インクリメント演算子のオーバーロード
    // C++03 と同様に実装する
 
-   ipv4& operator++()
+   ipv4 &operator++()
    {
       *this = ipv4(1 + to_ulong());
       return *this;
    }
 
-   ipv4& operator++(int)
+   ipv4 &operator++(int)
    {
       ipv4 result(*this);
       ++(*this);
@@ -90,39 +92,39 @@ public:
    // 比較演算子オーバーロード
    // C++03 と同様に実装する
 
-   friend bool operator==(ipv4 const & a1, ipv4 const & a2) noexcept
+   friend bool operator==(ipv4 const &a1, ipv4 const &a2) noexcept
    {
       return a1.data == a2.data;
    }
 
-   friend bool operator!=(ipv4 const & a1, ipv4 const & a2) noexcept
+   friend bool operator!=(ipv4 const &a1, ipv4 const &a2) noexcept
    {
       return !(a1 == a2);
    }
 
-   friend bool operator<(ipv4 const & a1, ipv4 const & a2) noexcept
+   friend bool operator<(ipv4 const &a1, ipv4 const &a2) noexcept
    {
       return a1.to_ulong() < a2.to_ulong();
    }
 
-   friend bool operator>(ipv4 const & a1, ipv4 const & a2) noexcept
+   friend bool operator>(ipv4 const &a1, ipv4 const &a2) noexcept
    {
       return a2 < a1;
    }
 
-   friend bool operator<=(ipv4 const & a1, ipv4 const & a2) noexcept
+   friend bool operator<=(ipv4 const &a1, ipv4 const &a2) noexcept
    {
       return !(a1 > a2);
    }
 
-   friend bool operator>=(ipv4 const & a1, ipv4 const & a2) noexcept
+   friend bool operator>=(ipv4 const &a1, ipv4 const &a2) noexcept
    {
       return !(a1 < a2);
    }
 
    // 以下、前項と同様
 
-   friend std::ostream& operator<<(std::ostream& os, const ipv4& a)
+   friend std::ostream &operator<<(std::ostream &os, const ipv4 &a)
    {
       os << static_cast<int>(a.data[0]) << '.'
          << static_cast<int>(a.data[1]) << '.'
@@ -131,7 +133,7 @@ public:
       return os;
    }
 
-   friend std::istream& operator>>(std::istream& is, ipv4& a)
+   friend std::istream &operator>>(std::istream &is, ipv4 &a)
    {
       char d1, d2, d3;
       int b1, b2, b3, b4;
@@ -153,7 +155,7 @@ int main()
    std::cin >> a1 >> a2;
    if (a2 > a1)
    {
-      for (ipv4 a = a1; a <= a2; a++)
+      for (auto a = a1; a <= a2; a++)
       {
          std::cout << a << std::endl;
       }

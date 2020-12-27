@@ -1,4 +1,4 @@
-// コンテナの any, all, none
+// #20 コンテナの any, all, none 関数
 #include <algorithm>
 #include <vector>
 #include <array>
@@ -7,15 +7,14 @@
 
 // これはふつう
 template<class C, class T>
-bool contains(C const & c, T const & value)
+bool contains(C const & c, T const & value) noexcept
 {
-   // 本書では cbegin/cend を採用。
    return std::cend(c) != std::find(std::cbegin(c), std::cend(c), value);
 }
 
 // ここがモダン
 template<class C, class... T>
-bool contains_any(C const & c, T &&... value)
+bool contains_any(C const & c, T &&... value) noexcept
 {
    // 畳み込み
    // 左部分が true なら右部分の contains() が呼び出されないとのこと。
@@ -24,7 +23,7 @@ bool contains_any(C const & c, T &&... value)
 }
 
 template<class C, class... T>
-bool contains_all(C const & c, T &&... value)
+bool contains_all(C const & c, T &&... value) noexcept
 {
    // 畳み込み
    return (... && contains(c, value));
@@ -32,16 +31,16 @@ bool contains_all(C const & c, T &&... value)
 
 // 論理的には none() は !any() でなければならないので：
 template<class C, class... T>
-bool contains_none(C const & c, T &&... value)
+bool contains_none(C const & c, T &&... value) noexcept
 {
    return !contains_any(c, std::forward<T>(value)...);
 }
 
 int main()
 {
-   std::vector<int> v{ 1,2,3,4,5,6 };
-   std::array<int, 6> a{ { 1,2,3,4,5,6 } };
-   std::list<int> l{ 1,2,3,4,5,6 };
+   std::array<int, 6> a{ 1,2,3,4,5,6 };
+   std::vector<int> v{ a.cbegin(), a.cend() };
+   std::list<int> l{ a.cbegin(), a.cend() };
 
    assert(contains(v, 3));
    assert(contains(a, 3));
