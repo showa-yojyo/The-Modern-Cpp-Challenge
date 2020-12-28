@@ -40,9 +40,10 @@ void print_processes(std::vector<procinfo> processes)
    // ラムダ式を使ってソートする。
    // 出力機能がいちいち引数をコピーするのは問題かもしれない。
    std::sort(
-      std::begin(processes), std::end(processes),
+      std::cbegin(processes), std::cend(processes),
       [](procinfo const & p1, procinfo const & p2) {
          return p1.name < p2.name; });
+
    // 範囲 for 文
    for (auto const & pi : processes)
    {

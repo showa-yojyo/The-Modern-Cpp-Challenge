@@ -35,7 +35,7 @@ std::uintmax_t get_directory_size(
    // std::accumulate() にラムダ式で演算を与える。
    // いつものように uintmax_t などを採用することに注意。
    return std::accumulate(
-      fs::begin(iterator), fs::end(iterator),
+      fs::cbegin(iterator), fs::cend(iterator),
       0ull,
       [](std::uintmax_t const total,
          fs::directory_entry const & entry) {
