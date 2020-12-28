@@ -1,5 +1,5 @@
 // #43 複数のタイムゾーンにおける打ち合わせ時間
-// TODO: ビルド不能
+// ソースコードからはわかりにくいが、curlcpp をリンクする必要がある。
 #include <iostream>
 #include <string>
 #include <vector>
@@ -61,3 +61,9 @@ int main()
 
    print_meeting_times(localtime, users);
 }
+// Hour:23
+// Minutes:16
+// Local time:    2020-12-28 23:16:00 JST
+// Ildiko         2020-12-28 15:16:00 CET
+// Jens           2020-12-28 15:16:00 CET
+// Jane           2020-12-28 09:16:00 EST

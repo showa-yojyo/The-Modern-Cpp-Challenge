@@ -3,7 +3,7 @@
 #include "date.h"
 #include "iso_week.h"
 
-unsigned int week_day(int const y, unsigned int const m, unsigned int const d)
+constexpr unsigned int week_day(int y, unsigned int m, unsigned int d)
 {
    using namespace date;
 
@@ -13,8 +13,7 @@ unsigned int week_day(int const y, unsigned int const m, unsigned int const d)
    auto const tiso = iso_week::year_weeknum_weekday{ dt };
 
    // 火曜日ならば 2 を返すようだ。
-   // それにしてもこのキャストは何とかならないか。
-   return (unsigned int)tiso.weekday();
+   return static_cast<unsigned int>(tiso.weekday());
 }
 
 int main()

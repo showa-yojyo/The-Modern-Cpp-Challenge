@@ -6,8 +6,8 @@
 
 // こちらは左ひく右
 inline int number_of_days(
-   int const y1, unsigned int const m1, unsigned int const d1,
-   int const y2, unsigned int const m2, unsigned int const d2)
+   int y1, unsigned int m1, unsigned int d1,
+   int y2, unsigned int m2, unsigned int d2)
 {
    using namespace date;
 
