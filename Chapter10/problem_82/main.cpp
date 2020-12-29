@@ -6,7 +6,7 @@
 
 #include "pngwriter.h"
 
-void create_flag(int const width, int const height, std::string_view filepath)
+void create_flag(int width, int height, std::string_view filepath)
 {
    pngwriter flag{ width, height, 0, filepath.data() };
 

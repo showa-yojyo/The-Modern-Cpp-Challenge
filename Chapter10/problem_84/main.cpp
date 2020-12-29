@@ -40,7 +40,7 @@ public:
       return result;
    }
 
-   std::string to_string() const noexcept
+   const std::string& to_string() const noexcept
    {
       return number;
    }
@@ -53,7 +53,7 @@ private:
       // ラムダ式にはもう慣れたか？
       auto sum = std::accumulate(
          std::begin(code), std::end(code), 0,
-         [&weights, &index](int const total, char const c) {
+         [&weights, &index](auto total, auto c) {
          return total + weights[index++] * (c - '0'); });
 
       return 10 - sum % 10;
@@ -66,9 +66,9 @@ struct ean13_barcode_generator
 {
    void create(ean13 const & code,
       std::string_view filename,
-      int const digit_width = 3,
-      int const height = 50,
-      int const margin = 10)
+      int digit_width = 3,
+      int height = 50,
+      int margin = 10)
    {
       pngwriter image(
          margin * 2 + 95 * digit_width,
@@ -104,8 +104,8 @@ private:
    int draw_digit(
       unsigned char code, unsigned int size,
       pngwriter& image,
-      int const x, int const y,
-      int const digit_width, int const height)
+      int x, int y,
+      int digit_width, int height)
    {
       std::bitset<7> bits(code);
       int pos = x;

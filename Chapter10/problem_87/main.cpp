@@ -40,8 +40,8 @@ movie_list get_movies(std::string_view title, sqlite::database & db)
 
    db << R"(select rowid, * from movies where title=?;)"
       << title.data()
-      >> [&movies, &db](sqlite3_int64 const rowid, std::string const & title,
-         int const year, int const length)
+      >> [&movies, &db](sqlite3_int64 rowid, std::string const & title,
+         int year, int length)
    {
       movies.emplace_back(movie{
          static_cast<unsigned int>(rowid),
@@ -57,7 +57,7 @@ movie_list get_movies(std::string_view title, sqlite::database & db)
    return movies;
 }
 
-bool add_media(sqlite_int64 const movieid,
+bool add_media(sqlite_int64 movieid,
                std::string_view name,
                std::string_view description,
                std::vector<char> content,
@@ -77,21 +77,17 @@ bool add_media(sqlite_int64 const movieid,
    catch (...) { return false; }
 }
 
-media_list get_media(sqlite_int64 const movieid,
+media_list get_media(sqlite_int64 movieid,
                      sqlite::database & db)
 {
    media_list list;
 
    db << "select rowid, * from media where movieid = ?;"
       << movieid
-      >> [&list](sqlite_int64 const rowid,
-            sqlite_int64 const movieid,
+      >> [&list](sqlite_int64 rowid,
+            sqlite_int64 movieid,
             std::string const & name,
-#ifdef USE_BOOST_OPTIONAL
-            std::unique_ptr<std::string> const text,
-#else
             optional<std::string> const text,
-#endif
             std::vector<char> const & blob
          )
          {
@@ -110,7 +106,7 @@ media_list get_media(sqlite_int64 const movieid,
    return list;
 }
 
-bool delete_media(sqlite_int64 const mediaid,
+bool delete_media(sqlite_int64 mediaid,
                   sqlite::database & db)
 {
    try
@@ -123,11 +119,11 @@ bool delete_media(sqlite_int64 const mediaid,
    catch (...) { return false; }
 }
 
-std::vector<std::string> split(std::string text, char const delimiter)
+std::vector<std::string> split(std::string text, char delimiter)
 {
-   auto sstr = std::stringstream{ text };
-   auto tokens = std::vector<std::string>{};
-   auto token = std::string{};
+   std::stringstream sstr{ text };
+   std::vector<std::string> tokens;
+   std::string token;
    while (std::getline(sstr, token, delimiter))
    {
       if (!token.empty()) tokens.push_back(token);
@@ -158,7 +154,7 @@ std::vector<char> load_image(std::string_view filepath)
       ifile.seekg(0, std::ios::beg);
 
       data.resize(static_cast<size_t>(size));
-      ifile.read(reinterpret_cast<char*>(data.data()), size);
+      ifile.read(&data[0], size);
    }
 
    return data;
@@ -225,8 +221,7 @@ void run_add(std::string_view line, sqlite::database & db)
       auto content = load_image(parts[1]);
       auto name = path.filename().string();
 
-      auto success = add_media(movieid, name, desc, content, db);
-      if (success)
+      if (add_media(movieid, name, desc, content, db))
          std::cout << "added" << std::endl;
       else
          std::cout << "failed" << std::endl;
@@ -240,8 +235,7 @@ void run_del(std::string_view line, sqlite::database & db)
    auto mediaid = std::stoi(trim(line.substr(4)));
    if (mediaid > 0)
    {
-      auto success = delete_media(mediaid, db);
-      if (success)
+      if (delete_media(mediaid, db))
          std::cout << "deleted" << std::endl;
       else
          std::cout << "failed" << std::endl;

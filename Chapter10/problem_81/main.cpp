@@ -145,7 +145,7 @@ int main()
       std::cout << "Enter password:";
       std::cin >> password;
 
-      compress(inputpath, archivepath, password, [](std::string_view message) {std::cout << message << std::endl; });
+      compress(inputpath, archivepath, password, [](auto message) {std::cout << message << std::endl; });
    }
    else if (option == 'd')
    {
@@ -159,7 +159,7 @@ int main()
       std::cout << "Enter password:";
       std::cin >> password;
 
-      decompress(outputpath, archivepath, password, [](std::string_view message) {std::cout << message << std::endl; });
+      decompress(outputpath, archivepath, password, [](auto message) {std::cout << message << std::endl; });
    }
    else
    {

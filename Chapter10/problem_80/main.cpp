@@ -126,7 +126,7 @@ int main()
       std::cout << "Enter archive path:";
       std::cin >> archivepath;
 
-      compress(inputpath, archivepath, [](std::string_view message) {std::cout << message << std::endl; });
+      compress(inputpath, archivepath, [](auto message) {std::cout << message << std::endl; });
    }
    else if (option == 'd')
    {
@@ -137,7 +137,7 @@ int main()
       std::cout << "Enter archive path:";
       std::cin >> archivepath;
 
-      decompress(outputpath, archivepath, [](std::string_view message) {std::cout << message << std::endl; });
+      decompress(outputpath, archivepath, [](auto message) {std::cout << message << std::endl; });
    }
    else
    {

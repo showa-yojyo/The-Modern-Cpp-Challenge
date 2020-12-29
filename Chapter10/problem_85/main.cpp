@@ -24,7 +24,7 @@ void print_movie(movie const & m)
    std::cout << std::endl << std::endl;
 }
 
-std::vector<std::string> get_directors(sqlite3_int64 const movie_id,
+std::vector<std::string> get_directors(sqlite3_int64 movie_id,
                                        sqlite::database & db)
 {
    std::vector<std::string> result;
@@ -34,7 +34,7 @@ std::vector<std::string> get_directors(sqlite3_int64 const movie_id,
             join persons as p on d.personid = p.rowid
             where d.movieid = ?;)"
       << movie_id
-      >> [&result](std::string const name)
+      >> [&result](std::string name) // ここは auto と書けない！
    {
       // 今まであまり見かけなかった emplate_back()
       result.emplace_back(name);
@@ -43,7 +43,7 @@ std::vector<std::string> get_directors(sqlite3_int64 const movie_id,
    return result;
 }
 
-std::vector<std::string> get_writers(sqlite3_int64 const movie_id,
+std::vector<std::string> get_writers(sqlite3_int64 movie_id,
                                      sqlite::database & db)
 {
    std::vector<std::string> result;
@@ -51,7 +51,7 @@ std::vector<std::string> get_writers(sqlite3_int64 const movie_id,
          join persons as p on w.personid = p.rowid
          where w.movieid = ?;)"
       << movie_id
-      >> [&result](std::string const name)
+      >> [&result](std::string name) // ここは auto と書けない！
    {
       result.emplace_back(name);
    };
@@ -59,7 +59,7 @@ std::vector<std::string> get_writers(sqlite3_int64 const movie_id,
    return result;
 }
 
-std::vector<casting_role> get_cast(sqlite3_int64 const movie_id,
+std::vector<casting_role> get_cast(sqlite3_int64 movie_id,
                                    sqlite::database & db)
 {
    std::vector<casting_role> result;
@@ -67,7 +67,7 @@ std::vector<casting_role> get_cast(sqlite3_int64 const movie_id,
          join persons as p on c.personid = p.rowid
          where c.movieid = ?;)"
       << movie_id
-      >> [&result](std::string const name, std::string role)
+      >> [&result](std::string name, std::string role) // ここは auto と書けない！
    {
       result.emplace_back(casting_role{ name, role });
    };
@@ -80,8 +80,8 @@ movie_list get_movies(sqlite::database & db)
    movie_list movies;
 
    db << R"(select rowid, * from movies;)"
-      >> [&movies, &db](sqlite3_int64 const rowid, std::string const & title,
-                        int const year, int const length)
+      >> [&movies, &db](sqlite3_int64 rowid, std::string const & title,
+                        int year, int length)
    {
       movies.emplace_back(movie{
          static_cast<unsigned int>(rowid),

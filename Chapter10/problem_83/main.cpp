@@ -10,8 +10,8 @@
 #include "pngwriter.h"
 
 void create_image(
-   int const width, int const height,
-   std::string_view font, int const font_size,
+   int width, int height,
+   std::string_view font, int font_size,
    std::string_view filepath)
 {
    pngwriter image{ width, height, 0, filepath.data() };
@@ -32,8 +32,8 @@ void create_image(
    {
       image.line(
          iter, 0, iter, height,
-         65535 - int(65535 * ((double)iter) / (width)),
-         int(65535 * ((double)iter) / (width)),
+         65535 - int(65535 * double(iter) / width),
+         int(65535 * double(iter) / width),
          65535);
    }
 
