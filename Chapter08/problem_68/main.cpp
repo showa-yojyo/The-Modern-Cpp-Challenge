@@ -26,7 +26,7 @@ class basic_password_generator : public password_generator
    size_t len;
 
 public:
-   explicit basic_password_generator(size_t const len) noexcept : len(len) {}
+   explicit basic_password_generator(size_t len) noexcept : len(len) {}
 
    // これを省略することはできるか？
    virtual std::string generate() override
@@ -44,7 +44,7 @@ public:
 class digit_generator : public basic_password_generator
 {
 public:
-   explicit digit_generator(size_t const len) noexcept
+   explicit digit_generator(size_t len) noexcept
    : basic_password_generator(len) {}
 
    virtual std::string allowed_chars() const override
@@ -54,7 +54,7 @@ public:
 class symbol_generator : public basic_password_generator
 {
 public:
-   explicit symbol_generator(size_t const len) noexcept
+   explicit symbol_generator(size_t len) noexcept
    : basic_password_generator(len) {}
 
    virtual std::string allowed_chars() const override
@@ -64,7 +64,7 @@ public:
 class upper_letter_generator : public basic_password_generator
 {
 public:
-   explicit upper_letter_generator(size_t const len) noexcept
+   explicit upper_letter_generator(size_t len) noexcept
    : basic_password_generator(len) {}
 
    virtual std::string allowed_chars() const override
@@ -74,7 +74,7 @@ public:
 class lower_letter_generator : public basic_password_generator
 {
 public:
-   explicit lower_letter_generator(size_t const len) noexcept
+   explicit lower_letter_generator(size_t len) noexcept
    : basic_password_generator(len) {}
 
    virtual std::string allowed_chars() const override
@@ -105,11 +105,11 @@ public:
       std::string password;
       for(auto & generator : generators)
       {
-         std::string chars = generator->allowed_chars();
+         auto chars = generator->allowed_chars();
          std::uniform_int_distribution<> ud(0, static_cast<int>(chars.length() - 1));
 
          // 一定の回数だけ同じ処理を繰り返す
-         for(size_t i = 0; i < generator->length(); ++i)
+         for(decltype(generator->length()) i = 0; i < generator->length(); ++i)
             // ud(eng) の呼び出し結果が毎回異なると思われる
             password += chars[ud(eng)];
       }

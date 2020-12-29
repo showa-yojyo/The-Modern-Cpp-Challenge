@@ -18,12 +18,12 @@ enum class sex_type {female, male};
 class social_number_generator
 {
 protected:
-   virtual int sex_digit(sex_type const sex) const noexcept = 0;
-   virtual int next_random(unsigned const year, unsigned const month, unsigned const day) = 0;
+   virtual int sex_digit(sex_type sex) const noexcept = 0;
+   virtual int next_random(unsigned year, unsigned month, unsigned day) = 0;
    virtual int modulo_value() const noexcept = 0;
 
    // コンストラクターで乱数を設定
-   social_number_generator(int const min, int const max):ud(min, max)
+   social_number_generator(int min, int max):ud(min, max)
    {
       std::random_device rd;
       auto seed_data = std::array<int, std::mt19937::state_size> {};
@@ -35,24 +35,22 @@ protected:
 public:
    // 表に出すメソッドはここにある
    std::string generate(
-      sex_type const sex,
-      unsigned const year, unsigned const month, unsigned const day)
+      sex_type sex,
+      unsigned year, unsigned month, unsigned day)
    {
       std::stringstream snumber;
 
       snumber << sex_digit(sex);
-
       snumber << year << month << day;
-
       snumber << next_random(year, month, day);
 
       auto number = snumber.str();
-
       auto index = number.length();
       // 怪しいラムダ式
-      auto sum = std::accumulate(std::begin(number), std::end(number), 0u,
-                                 [&index](unsigned int const s, char const c) {
-                                    return s + static_cast<unsigned int>(index-- * (c-'0'));});
+      auto sum = std::accumulate(
+         std::cbegin(number), std::cend(number), 0u,
+         [&index](auto s, auto c) {
+             return s + static_cast<unsigned int>(index-- * (c-'0'));});
 
       auto rest = sum % modulo_value();
       snumber << modulo_value() - rest;
@@ -77,13 +75,13 @@ public:
    }
 
 protected:
-   virtual int sex_digit(sex_type const sex) const noexcept override
+   virtual int sex_digit(sex_type sex) const noexcept override
    {
       if(sex == sex_type::female) return 1;
       else return 2;
    }
 
-   virtual int next_random(unsigned const year, unsigned const month, unsigned const day) override
+   virtual int next_random(unsigned year, unsigned month, unsigned day) override
    {
       auto key = year * 10000 + month * 100 + day;
       while(true)
@@ -119,14 +117,14 @@ protected:
       else return 7;
    }
 
-   virtual int next_random(unsigned const year, unsigned const month, unsigned const day) override
+   virtual int next_random(unsigned year, unsigned month, unsigned day) override
    {
       auto key = year * 10000 + month * 100 + day;
       while(true)
       {
          auto number = ud(eng);
          auto pos = cache.find(number);
-         if(pos == std::end(cache))
+         if(pos == std::cend(cache))
          {
             cache[key] = number;
             return number;
@@ -152,7 +150,7 @@ public:
    social_number_generator* get_generator(std::string_view country) const
    {
       auto it = generators.find(country.data());
-      if(it != std::end(generators))
+      if(it != std::cend(generators))
          return it->second.get();
 
       throw std::runtime_error("invalid country");

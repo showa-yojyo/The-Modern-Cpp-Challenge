@@ -113,8 +113,6 @@ public:
 int main()
 {
    {
-      // std::make_unique だが、別にヒープ上に作成する必要はないはず。
-      // 以下同様。
       auto validator = std::make_unique<length_validator>(8);
 
       assert(validator->validate("abc123!@#"));

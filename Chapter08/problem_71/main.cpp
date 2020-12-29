@@ -16,7 +16,7 @@ enum class collection_action
 };
 
 // to_string() を自前で実装する
-std::string to_string(collection_action const action)
+std::string to_string(collection_action action)
 {
    switch(action)
    {
@@ -182,8 +182,9 @@ public:
 
    void remove_observer(collection_observer const * const o)
    {
-      observers.erase(std::remove(std::begin(observers), std::end(observers), o),
-                      std::end(observers));
+      observers.erase(
+         std::remove(std::begin(observers), std::end(observers), o),
+         std::end(observers));
    }
 
 private:

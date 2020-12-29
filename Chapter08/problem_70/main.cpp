@@ -56,7 +56,7 @@ struct expense
    double      amount;
    std::string description;
 
-   expense(double const amount, std::string_view desc):
+   expense(double amount, std::string_view desc):
       amount(amount), description(desc)
    {
    }
@@ -113,7 +113,7 @@ int main()
    john->approve(expense{200000, "new lorry"});
 }
 
-// john smith approved expense 'magazins', cost=500
+// john smith approved expense 'magazines', cost=500
 // robert booth approved expense 'hotel accomodation', cost=5000
 // david jones approved expense 'conference costs', cost=50000
 // cecil williamson approved expense 'new lorry', cost=200000

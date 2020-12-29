@@ -7,7 +7,7 @@
 #include <cmath>
 #include <cassert>
 
-inline bool are_equal(double const d1, double const d2, double const diff = 0.001)
+inline bool are_equal(double d1, double d2, double diff = 0.001) noexcept
 {
    return std::abs(d1 - d2) <= diff;
 }
@@ -17,15 +17,15 @@ inline bool are_equal(double const d1, double const d2, double const diff = 0.00
 // 値引き種別
 struct discount_type
 {
-   virtual double discount_percent(double const price, double const quantity) const noexcept = 0;
+   virtual double discount_percent(double price, double quantity) const noexcept = 0;
    virtual ~discount_type(){}
 };
 
 // 定額値引き
 struct fixed_discount final : public discount_type
 {
-   explicit fixed_discount(double const discount) noexcept : discount(discount) {}
-   virtual double discount_percent(double const, double const) const noexcept {return discount;}
+   explicit fixed_discount(double discount) noexcept : discount(discount) {}
+   virtual double discount_percent(double price, double quantity) const noexcept {return discount;}
 
 private:
    double discount;
@@ -34,10 +34,10 @@ private:
 // 量による値引き
 struct volume_discount final : public discount_type
 {
-   explicit volume_discount(double const quantity, double const discount) noexcept
+   explicit volume_discount(double quantity, double discount) noexcept
        : discount(discount), min_quantity(quantity) {}
 
-   virtual double discount_percent(double const, double const quantity) const noexcept
+   virtual double discount_percent(double price, double quantity) const noexcept
    {
       return quantity >= min_quantity ? discount : 0;
    }
@@ -50,10 +50,10 @@ private:
 // 価格による値引き
 struct price_discount : public discount_type
 {
-   explicit price_discount(double const price, double const discount) noexcept
+   explicit price_discount(double price, double discount) noexcept
        : discount(discount), min_total_price(price){}
 
-   virtual double discount_percent(double const price, double const quantity) const noexcept
+   virtual double discount_percent(double price, double quantity) const noexcept
    {
       return price*quantity >= min_total_price ? discount : 0;
    }
@@ -66,10 +66,10 @@ private:
 // 個数による値引き
 struct amount_discount : public discount_type
 {
-   explicit amount_discount(double const price, double const discount) noexcept
+   explicit amount_discount(double price, double discount) noexcept
        : discount(discount), min_total_price(price) {}
 
-   virtual double discount_percent(double const price, double const) const noexcept
+   virtual double discount_percent(double price, double quantity) const noexcept
    {
       return price >= min_total_price ? discount : 0;
    }
