@@ -253,7 +253,7 @@ public:
    }
 private:
    face_detect_response parse_detect_response(
-      long const status,
+      long status,
       std::stringstream & str)
    {
       json jdata;

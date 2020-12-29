@@ -10,7 +10,7 @@
 #include "asio.hpp"
 
 // 本書の説明 (p. 257) 参照
-std::string fizzbuzz(int const number)
+std::string fizzbuzz(int number)
 {
    // コードを見ればわかるか
    if (number != 0)
@@ -51,7 +51,7 @@ private:
       // ラムダ式でインラインに処理を定義する。
       tcp_socket.async_read_some(
          asio::buffer(data, data.size()),
-         [this, self](std::error_code const ec, std::size_t const length)
+         [this, self](std::error_code ec, std::size_t length)
       {
          if (!ec)
          {
@@ -73,7 +73,7 @@ private:
       // ソケット操作
       tcp_socket.async_write_some(
          asio::buffer(response.data(), response.length()),
-         [this, self](std::error_code const ec, std::size_t const)
+         [this, self](std::error_code ec, std::size_t)
       {
          if (!ec)
          {
@@ -90,7 +90,7 @@ private:
 class server
 {
 public:
-   server(asio::io_context& context, short const port)
+   server(asio::io_context& context, short port)
       : tcp_acceptor(context, asio::ip::tcp::endpoint(asio::ip::tcp::v4(), port))
       , tcp_socket(context)
    {
@@ -118,7 +118,7 @@ private:
 };
 
 // Ctrl+C するまで稼働し続ける
-void run_server(short const port)
+void run_server(short port)
 {
    try
    {

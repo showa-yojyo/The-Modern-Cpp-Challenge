@@ -13,7 +13,7 @@ class imap_connection
 public:
    imap_connection(
       std::string_view url,
-      unsigned short const port,
+      unsigned const port,
       std::string_view user,
       std::string_view pass):
       url(url), port(port), user(user), pass(pass)

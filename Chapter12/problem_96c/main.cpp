@@ -7,7 +7,7 @@
 #define ASIO_STANDALONE
 #include "asio.hpp"
 
-void run_client(std::string_view host, short const port)
+void run_client(std::string_view host, short port)
 {
    try
    {

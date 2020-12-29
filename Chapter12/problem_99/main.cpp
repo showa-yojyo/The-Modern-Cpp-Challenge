@@ -16,7 +16,7 @@
 #include "curl_exception.h"
 #include "curl_header.h"
 
-// 文字コード変換関数の実装例
+// エンコーディング変換関数の実装例
 std::wstring utf8_to_utf16(std::string_view text)
 {
    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
@@ -24,7 +24,7 @@ std::wstring utf8_to_utf16(std::string_view text)
    return wtext;
 }
 
-// 文字コード変換関数の実装例
+// エンコーディング変換関数の実装例
 std::string utf16_to_utf8(std::wstring_view wtext)
 {
    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;

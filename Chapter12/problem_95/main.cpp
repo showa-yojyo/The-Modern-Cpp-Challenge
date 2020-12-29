@@ -19,7 +19,8 @@ std::vector<std::string> get_ip_address(std::string_view hostname)
       asio::io_context context;
       // 問い合わせをエンドポイントに解決する機能
       asio::ip::tcp::resolver resolver(context);
-      auto endpoints = resolver.resolve(asio::ip::tcp::v4(), hostname.data(), "");
+      auto endpoints = resolver.resolve(
+         asio::ip::tcp::v4(), hostname.data(), "");
 
       for (const auto& e: endpoints)
          // 本書のコードに置き換える
