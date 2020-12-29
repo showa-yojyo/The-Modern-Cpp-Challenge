@@ -41,7 +41,8 @@ auto pprocess(Iterator begin, Iterator end, F&& f)
    else
    {
       auto task_count = std::thread::hardware_concurrency();
-      std::vector<std::future<typename std::iterator_traits<Iterator>::value_type>> tasks;
+      using value_type = typename std::iterator_traits<Iterator>::value_type;
+      std::vector<std::future<value_type>> tasks;
 
       auto first = begin;
       auto last = first;
@@ -61,11 +62,11 @@ auto pprocess(Iterator begin, Iterator end, F&& f)
       }
 
       // ここを書き換えたい
-      std::vector<typename std::iterator_traits<Iterator>::value_type> mins;
+      std::vector<value_type> mins;
       for (auto & t : tasks)
          mins.push_back(t.get());
 
-      return std::forward<F>(f)(std::begin(mins), std::end(mins));
+      return std::forward<F>(f)(std::cbegin(mins), std::cend(mins));
    }
 }
 
@@ -104,13 +105,13 @@ int main()
       std::cout << "minimum element" << std::endl;
 
       auto start = std::chrono::system_clock::now();
-      auto r1 = smin(std::begin(data), std::end(data));
+      auto r1 = smin(std::cbegin(data), std::cend(data));
       auto end = std::chrono::system_clock::now();
       auto t1 = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
       std::cout << "seq time: " << t1.count() << "ms" << std::endl;
 
       start = std::chrono::system_clock::now();
-      auto r2 = pmin(std::begin(data), std::end(data));
+      auto r2 = pmin(std::cbegin(data), std::cend(data));
       end = std::chrono::system_clock::now();
       auto t2 = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
       std::cout << "par time: " << t2.count() << "ms" << std::endl;
@@ -122,13 +123,13 @@ int main()
       std::cout << "maximum element" << std::endl;
 
       auto start = std::chrono::system_clock::now();
-      auto r1 = smax(std::begin(data), std::end(data));
+      auto r1 = smax(std::cbegin(data), std::cend(data));
       auto end = std::chrono::system_clock::now();
       auto t1 = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
       std::cout << "seq time: " << t1.count() << "ms" << std::endl;
 
       start = std::chrono::system_clock::now();
-      auto r2 = pmax(std::begin(data), std::end(data));
+      auto r2 = pmax(std::cbegin(data), std::cend(data));
       end = std::chrono::system_clock::now();
       auto t2 = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
       std::cout << "par time: " << t2.count() << "ms" << std::endl;

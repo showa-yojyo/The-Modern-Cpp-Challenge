@@ -15,7 +15,7 @@ template <typename T, typename F>
 std::vector<T> alter(std::vector<T> data, F&& f)
 {
    std::transform(
-      std::begin(data), std::end(data), std::begin(data),
+      std::cbegin(data), std::cend(data), std::begin(data),
       std::forward<F>(f));
 
    return data;
@@ -27,7 +27,7 @@ std::vector<T> palter(std::vector<T> data, F&& f)
    if (data.size() <= 10000)
    {
       std::transform(
-         std::begin(data), std::end(data), std::begin(data),
+         std::cbegin(data), std::cend(data), std::begin(data),
          std::forward<F>(f));
    }
    else
@@ -95,6 +95,7 @@ template <typename T, typename F>
 std::vector<T> palter2(std::vector<T> data, F&& f)
 {
    ptransform(
+      // これは cbegin, cend に置き換え不能
       std::begin(data), std::end(data),
       std::forward<F>(f));
 
@@ -118,19 +119,19 @@ int main()
    std::generate_n(std::begin(data), count, [&mt, &ud]() {return ud(mt); });
 
    auto start = std::chrono::system_clock::now();
-   auto r1 = alter(data, [](int const e) {return e * e; });
+   auto r1 = alter(data, [](auto e) {return e * e; });
    auto end = std::chrono::system_clock::now();
    auto t1 = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
    std::cout << "time: " << t1.count() << "ms" << std::endl;
 
    start = std::chrono::system_clock::now();
-   auto r2 = palter(data, [](int const e) {return e * e; });
+   auto r2 = palter(data, [](auto e) {return e * e; });
    end = std::chrono::system_clock::now();
    auto t2 = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
    std::cout << "time: " << t2.count() << "ms" << std::endl;
 
    start = std::chrono::system_clock::now();
-   auto r3 = palter2(data, [](int const e) {return e * e; });
+   auto r3 = palter2(data, [](auto e) {return e * e; });
    end = std::chrono::system_clock::now();
    auto t3 = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
    std::cout << "time: " << t3.count() << "ms" << std::endl;
