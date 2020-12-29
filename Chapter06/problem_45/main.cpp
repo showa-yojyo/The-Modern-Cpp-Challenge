@@ -36,7 +36,7 @@ public:
       data.pop_back();
    }
 
-   const_reference top() const { return data.front(); }
+   const_reference top() const noexcept{ return data.front(); }
 
    void swap(priority_queue& other) noexcept
    {

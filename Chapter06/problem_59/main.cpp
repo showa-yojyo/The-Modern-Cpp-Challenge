@@ -31,24 +31,24 @@ public:
       mt.seed(seq);
    }
 
-   void run(int const copies)
+   void run(int copies)
    {
       auto parent = make_random();
-      int step = 1;
+      auto step = 1;
       std::cout << std::left << std::setw(5) << std::setfill(' ') << step << parent << std::endl;
 
       do
       {
          std::vector<std::string> children;
+         // ラムダ式のキャプチャーリストにおける this に注意。
          std::generate_n(
             std::back_inserter(children),
             copies,
             [parent, this]() {return mutate(parent, 5); });
 
-         // ラムダ式のキャプチャーリストにおける this に注意。
          parent = *std::max_element(
-            std::begin(children), std::end(children),
-            [this](std::string_view c1, std::string_view c2) {return fitness(c1) < fitness(c2); });
+            std::cbegin(children), std::cend(children),
+            [this](auto c1, auto c2) {return fitness(c1) < fitness(c2); });
 
          std::cout << std::setw(5) << std::setfill(' ') << step << parent << std::endl;
          step++;
@@ -63,7 +63,7 @@ private:
    double fitness(std::string_view candidate)
    {
       int score = 0;
-      for (size_t i = 0; i < candidate.size(); ++i)
+      for (decltype(candidate.size()) i = 0; i < candidate.size(); ++i)
       {
          if (candidate[i] == target[i])
             score++;
@@ -72,7 +72,7 @@ private:
       return score;
    }
 
-   std::string mutate(std::string_view parent, double const rate)
+   std::string mutate(std::string_view parent, double rate)
    {
       std::stringstream sstr;
       for (auto const c : parent)
@@ -87,7 +87,7 @@ private:
    std::string make_random()
    {
       std::stringstream sstr;
-      for (size_t i = 0; i < target.size(); ++i)
+      for (decltype(target.size()) i = 0; i < target.size(); ++i)
       {
          sstr << allowed_chars[chardist(mt)];
       }

@@ -22,7 +22,7 @@ template <typename T>
 std::vector<std::pair<T, T>> pairwise(std::vector<T> const & range)
 {
    std::vector<std::pair<T, T>> result;
-   pairwise(std::begin(range), std::end(range),
+   pairwise(std::cbegin(range), std::cend(range),
       std::back_inserter(result));
 
    return result;

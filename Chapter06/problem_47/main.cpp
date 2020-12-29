@@ -16,7 +16,7 @@ class double_buffer
    typedef T const & const_reference;
    typedef T*        pointer;
 public:
-   explicit double_buffer(size_t const size) :
+   explicit double_buffer(size_t size) :
       rdbuf(size), wrbuf(size)
    {}
 
@@ -24,7 +24,7 @@ public:
 
    // 以下、すべての I/O 処理に同期処理を提供する。
 
-   void write(T const * const ptr, size_t const size)
+   void write(T const * const ptr, size_t size)
    {
       std::unique_lock<std::mutex> lock(mt);
       auto length = std::min(size, wrbuf.size());
@@ -57,7 +57,8 @@ public:
       return rdbuf[pos];
    }
 
-   void swap(double_buffer other)
+   // #45 の技法を適用してみる
+   void swap(double_buffer other) noexcept(noexcept(this->rdbuf.swap(other.rdbuf)))
    {
       std::swap(rdbuf, other.rdbuf);
       std::swap(wrbuf, other.wrbuf);
@@ -72,10 +73,10 @@ private:
 };
 
 template <typename T>
-void print_buffer(double_buffer<T> const & buf)
+std::ostream& operator<<(std::ostream& os, const double_buffer<T>& buf)
 {
-   buf.read(std::ostream_iterator<T>(std::cout, " "));
-   std::cout << std::endl;
+   buf.read(std::ostream_iterator<T>(os, " "));
+   return os;
 }
 
 int main()
@@ -99,7 +100,7 @@ int main()
    auto start = std::chrono::system_clock::now();
    do
    {
-      print_buffer(buf);
+      std::cout << buf << std::endl;
       std::this_thread::sleep_for(150ms);
    } while (std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now() - start).count() < 12);
 

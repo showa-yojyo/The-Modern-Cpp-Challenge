@@ -21,13 +21,13 @@ public:
 
 public:
 
-   void add_edge(Vertex const source, Vertex const target, Weight const weight)
+   void add_edge(Vertex source, Vertex target, Weight weight)
    {
       adjacency_list[source].push_back(std::make_pair(target, weight));
       adjacency_list[target].push_back(std::make_pair(source, weight));
    }
 
-   size_t vertex_count() const { return adjacency_list.size(); }
+   size_t vertex_count() const noexcept{ return adjacency_list.size(); }
 
    // 頂点のコピーを返す
    std::vector<Vertex> vertices() const
@@ -127,7 +127,7 @@ std::vector<Vertex> build_path(
 template <typename Vertex>
 void print_path(std::vector<Vertex> const & path)
 {
-   // Python の str.join() のような出力をする
+   // Python の '->'.join(path) のような出力をする
    for (size_t i = 0; i < path.size(); ++i)
    {
       std::cout << path[i];

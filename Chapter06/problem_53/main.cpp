@@ -14,7 +14,7 @@ struct movie
    std::vector<int> ratings;
 };
 
-double truncated_mean(std::vector<int> values, double const percentage)
+double truncated_mean(std::vector<int> values, double percentage)
 {
    // 両側 10% を削るにはソートしておく……。
    // std::nth_element() を二回呼び出す方法が考えられる。

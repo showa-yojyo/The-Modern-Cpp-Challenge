@@ -10,13 +10,9 @@ void zip(
    Input2 begin2, Input2 end2,
    Output result)
 {
-   // これもふつうは for ループで書くものだ。
-   // it1, it2 も for ループのスコープにするのが品が良い。
-   auto it1 = begin1;
-   auto it2 = begin2;
-   while (it1 != end1 && it2 != end2)
+   while (begin1 != end1 && begin2 != end2)
    {
-      result++ = std::make_pair(*it1++, *it2++);
+      result++ = std::make_pair(*begin1++, *begin2++);
    }
 }
 
@@ -29,8 +25,8 @@ std::vector<std::pair<T, U>> zip(
    std::vector<std::pair<T, U>> result;
 
    zip(
-      std::begin(range1), std::end(range1),
-      std::begin(range2), std::end(range2),
+      std::cbegin(range1), std::cend(range1),
+      std::cbegin(range2), std::cend(range2),
       std::back_inserter(result));
 
    return result;

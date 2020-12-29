@@ -26,7 +26,7 @@ class circular_buffer_iterator
    typedef std::random_access_iterator_tag   iterator_category; // 本当か？
    typedef ptrdiff_t                         difference_type;
 public:
-   circular_buffer_iterator(circular_buffer<T> const & buf, size_t const pos, bool const last) :
+   circular_buffer_iterator(circular_buffer<T> const & buf, size_t pos, bool last) :
       buffer_(buf), index_(pos), last_(last)
    {}
 
@@ -88,7 +88,7 @@ class circular_buffer
    // 要件のとおりにデフォルトコンストラクタは禁止する
    circular_buffer() = delete;
 public:
-   explicit circular_buffer(size_t const size) :data_(size)
+   explicit circular_buffer(size_t size) :data_(size)
    {}
 
    // 本書では void 型
@@ -100,7 +100,7 @@ public:
    size_t size() const noexcept { return size_; }
 
    // バッファに新たな要素を追加する。
-   void push(T const item)
+   void push(T item)
    {
       // ヘッドポインタの次の位置に常に挿入する。
       head_ = next_pos();
@@ -142,18 +142,15 @@ private:
    friend class circular_buffer_iterator<T>;
 };
 
-// これも ostream<< 対応したい。
 template <typename T>
-void print(circular_buffer<T> & buf)
+std::ostream& operator<<(std::ostream& os, const circular_buffer<T>& buf)
 {
-   for (auto & e : buf)
+   for(const auto& e: buf)
    {
-      std::cout << e << ' ';
+      os << e << ' ';
    }
-
-   std::cout << std::endl;
+   return os;
 }
-
 
 int main()
 {
@@ -162,7 +159,7 @@ int main()
    assert(cbuf.empty());
    assert(!cbuf.full());
    assert(cbuf.size() == 0);
-   print(cbuf);
+   std::cout << cbuf << std::endl;
 
    cbuf.push(1);
    cbuf.push(2);
@@ -170,7 +167,7 @@ int main()
    assert(!cbuf.empty());
    assert(!cbuf.full());
    assert(cbuf.size() == 3);
-   print(cbuf);
+   std::cout << cbuf << std::endl;
 
    auto item = cbuf.pop();
    assert(item == 1);
@@ -184,14 +181,14 @@ int main()
    assert(!cbuf.empty());
    assert(cbuf.full());
    assert(cbuf.size() == 5);
-   print(cbuf);
+   std::cout << cbuf << std::endl;
 
    cbuf.push(7);
    cbuf.push(8);
    assert(!cbuf.empty());
    assert(cbuf.full());
    assert(cbuf.size() == 5);
-   print(cbuf);
+   std::cout << cbuf << std::endl;
 
    item = cbuf.pop();
    assert(item == 4);
@@ -203,7 +200,7 @@ int main()
    assert(!cbuf.empty());
    assert(!cbuf.full());
    assert(cbuf.size() == 2);
-   print(cbuf);
+   std::cout << cbuf << std::endl;
 
    item = cbuf.pop();
    assert(item == 7);
@@ -213,11 +210,11 @@ int main()
    assert(cbuf.empty());
    assert(!cbuf.full());
    assert(cbuf.size() == 0);
-   print(cbuf);
+   std::cout << cbuf << std::endl;
 
    cbuf.push(9);
    assert(!cbuf.empty());
    assert(!cbuf.full());
    assert(cbuf.size() == 1);
-   print(cbuf);
+   std::cout << cbuf << std::endl;
 }

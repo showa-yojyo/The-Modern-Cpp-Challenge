@@ -41,7 +41,7 @@ int main()
       {404, "The Modern C++ Programming Cookbook", "Marius Bancila"}};
 
    // .title を select する
-   auto titles = select(books, [](book const & b) {return b.title; });
+   auto titles = select(books, [](auto const & b) {return b.title; });
 
    for (auto const & title : titles)
    {

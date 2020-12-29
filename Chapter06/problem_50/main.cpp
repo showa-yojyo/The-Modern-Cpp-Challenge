@@ -5,7 +5,7 @@
 #include <iostream>
 #include <algorithm>
 
-bool starts_with(std::string_view str, std::string_view prefix)
+bool starts_with(std::string_view str, std::string_view prefix) noexcept
 {
    return str.find(prefix) == 0;
 }

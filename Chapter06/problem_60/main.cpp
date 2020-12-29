@@ -11,6 +11,16 @@
 class universe
 {
 private:
+   size_t rows;
+   size_t columns;
+
+   std::vector<unsigned char> grid;
+   const unsigned char alive = 1;
+   const unsigned char dead = 0;
+
+   std::uniform_int_distribution<> dist;
+   std::mt19937 mt;
+
    // デフォルトコンストラクターは提供しない。
    universe() = delete;
 
@@ -26,21 +36,21 @@ public:
 
 public:
    // ライフゲームのコンストラクター
-   universe(size_t const width, size_t const height):
-      rows(height), columns(width),grid(width * height), dist(0, 4)
+   universe(size_t width, size_t height):
+      rows(height), columns(width), grid(width * height), dist(0, 4)
    {
       // 乱数
       std::random_device rd;
       auto seed_data = std::array<int, std::mt19937::state_size> {};
       std::generate(std::begin(seed_data), std::end(seed_data), std::ref(rd));
-      std::seed_seq seq(std::begin(seed_data), std::end(seed_data));
+      std::seed_seq seq(std::cbegin(seed_data), std::cend(seed_data));
       mt.seed(seq);
    }
 
    void run(
-      seed const s,
-      int const generations,
-      std::chrono::milliseconds const ms = std::chrono::milliseconds(100))
+      seed s,
+      int generations,
+      std::chrono::milliseconds ms = std::chrono::milliseconds(100))
    {
       reset();
       initialize(s);
@@ -64,9 +74,9 @@ private:
    {
       std::vector<unsigned char> newgrid(grid.size());
 
-      for (size_t r = 0; r < rows; ++r)
+      for (decltype(rows) r = 0; r < rows; ++r)
       {
-         for (size_t c = 0; c < columns; ++c)
+         for (decltype(columns) c = 0; c < columns; ++c)
          {
             // 生きている隣接細胞はいくつか
             auto count = count_neighbors(r, c);
@@ -96,9 +106,9 @@ private:
    {
       reset_display();
 
-      for (size_t r = 0; r < rows; ++r)
+      for (decltype(rows) r = 0; r < rows; ++r)
       {
-         for (size_t c = 0; c < columns; ++c)
+         for (decltype(columns) c = 0; c < columns; ++c)
          {
             std::cout << (cell(c, r) ? '*' : ' ');
          }
@@ -106,7 +116,7 @@ private:
       }
    }
 
-   void initialize(seed const s)
+   void initialize(seed s)
    {
       if (s == seed::small_explorer)
       {
@@ -143,14 +153,14 @@ private:
       }
       else if (s == seed::ten_cell_row)
       {
-         for (size_t c = columns / 2 - 5; c < columns / 2 + 5; c++)
+         for (decltype(columns) c = columns / 2 - 5; c < columns / 2 + 5; c++)
             cell(c, rows / 2) = alive;
       }
       else
       {
-         for (size_t r = 0; r < rows; ++r)
+         for (decltype(rows) r = 0; r < rows; ++r)
          {
-            for (size_t c = 0; c < columns; ++c)
+            for (decltype(columns) c = 0; c < columns; ++c)
             {
                cell(c, r) = dist(mt) == 0 ? alive : dead;
             }
@@ -161,25 +171,24 @@ private:
    // すべての細胞を死亡状態にする
    void reset()
    {
-      for (size_t r = 0; r < rows; ++r)
+      for (decltype(rows) r = 0; r < rows; ++r)
       {
-         for (size_t c = 0; c < columns; ++c)
+         for (decltype(columns) c = 0; c < columns; ++c)
          {
             cell(c, r) = dead;
          }
       }
    }
 
-   // 慌てるな。const にはできない。
-   int count_alive() { return 0; }
+   constexpr int count_alive() const noexcept { return 0; }
 
    // パラメーターパックに注意
    template<typename T1, typename... T>
-   auto count_alive(T1 s, T... ts) { return s + count_alive(ts...); }
+   auto count_alive(T1 s, T... ts) const noexcept { return s + count_alive(ts...); }
 
    // 生きている隣接細胞はいくつか。
    // ひじょうに面倒。
-   int count_neighbors(size_t const row, size_t const col)
+   int count_neighbors(size_t row, size_t col) const
    {
       if (row == 0 && col == 0)
          return count_alive(cell(1, 0), cell(1,1), cell(0, 1));
@@ -202,21 +211,15 @@ private:
    }
 
    // lvalue としてアクセスする。
-   unsigned char& cell(size_t const col, size_t const row)
+   unsigned char& cell(size_t col, size_t row)
    {
       return grid[row * columns + col];
    }
 
-private:
-   size_t rows;
-   size_t columns;
-
-   std::vector<unsigned char> grid;
-   const unsigned char alive = 1;
-   const unsigned char dead = 0;
-
-   std::uniform_int_distribution<> dist;
-   std::mt19937 mt;
+   unsigned char cell(size_t col, size_t row) const
+   {
+      return grid[row * columns + col];
+   }
 };
 
 int main()

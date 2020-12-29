@@ -113,7 +113,7 @@ int main()
 
       quicksort(std::begin(v), std::end(v));
 
-      print(std::begin(v), std::end(v));
+      print(std::cbegin(v), std::cend(v));
    }
 
    {
@@ -121,7 +121,7 @@ int main()
 
       quicksort(std::begin(a), std::end(a));
 
-      print(std::begin(a), std::end(a));
+      print(std::cbegin(a), std::cend(a));
    }
 
 
@@ -130,7 +130,7 @@ int main()
 
       quicksort(std::begin(a), std::end(a));
 
-      print(std::begin(a), std::end(a));
+      print(std::cbegin(a), std::cend(a));
    }
 
    {
@@ -138,7 +138,7 @@ int main()
 
       quicksort(std::begin(v), std::end(v), std::greater_equal<>());
 
-      print(std::begin(v), std::end(v));
+      print(std::cbegin(v), std::cend(v));
    }
 
    {
@@ -146,7 +146,7 @@ int main()
 
       quicksort(std::begin(a), std::end(a), std::greater_equal<>());
 
-      print(std::begin(a), std::end(a));
+      print(std::cbegin(a), std::cend(a));
    }
 
 
@@ -155,7 +155,7 @@ int main()
 
       quicksort(std::begin(a), std::end(a), std::greater_equal<>());
 
-      print(std::begin(a), std::end(a));
+      print(std::cbegin(a), std::cend(a));
    }
 
     {
@@ -163,7 +163,7 @@ int main()
 
         quicksorti(std::begin(v), std::end(v));
 
-        print(std::begin(v), std::end(v));
+        print(std::cbegin(v), std::cend(v));
     }
 
    {
