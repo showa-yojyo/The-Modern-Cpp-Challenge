@@ -43,13 +43,14 @@ public:
    // バイトのベクトルを base64 符号化する
    std::string to_base64(std::vector<unsigned char> const & data)
    {
-      std::string result;
-      // コンストラクターでサイズを指定するべきだろう
-      result.resize((data.size() / 3 + ((data.size() % 3 > 0) ? 1 : 0)) * 4);
+      std::string result(
+         (data.size() / 3 + ((data.size() % 3 > 0) ? 1 : 0)) * 4, 0);
       auto result_ptr = &result[0];
       size_t i = 0;
       size_t j = 0;
-      while (j++ < data.size() / 3)
+
+      const auto bound = data.size() / 3;
+      while (j++ < bound)
       {
          unsigned int value = (data[i] << 16) | (data[i+1] << 8) | data[i+2];
          i += 3;
@@ -60,8 +61,7 @@ public:
          *result_ptr++ = table_enc[(value & 0x0000003f)];
       };
 
-      auto rest = data.size() - i;
-      if (rest == 1)
+      if (auto rest = data.size() - i; rest == 1)
       {
          *result_ptr++ = table_enc[(data[i] & 0x000000fc) >> 2];
          *result_ptr++ = table_enc[(data[i] & 0x00000003) << 4];
@@ -84,7 +84,7 @@ public:
    // 復号アルゴリズム
    std::vector<unsigned char> from_base64(std::string data)
    {
-      size_t padding = data.size() % 4;
+      auto padding = data.size() % 4;
       if (padding == 0)
       {
          if (data[data.size() - 1] == padding_symbol) padding++;
@@ -96,13 +96,13 @@ public:
       }
 
       // これもコンストラクターでサイズを初期化する
-      std::vector<unsigned char> result;
-      result.resize((data.length() / 4) * 3 - padding);
+      std::vector<unsigned char> result((data.length() / 4) * 3 - padding);
       auto result_ptr = &result[0];
 
       size_t i = 0;
       size_t j = 0;
-      while (j++ < data.size() / 4)
+      const auto bound = data.size() / 4;
+      while (j++ < bound)
       {
          unsigned char c1 = table_dec[static_cast<int>(data[i++])];
          unsigned char c2 = table_dec[static_cast<int>(data[i++])];
@@ -141,26 +141,14 @@ public:
 // 補助的な
 namespace converter
 {
-   std::vector<unsigned char> from_string(std::string_view data)
+   auto from_string(std::string_view data)
    {
-      std::vector<unsigned char> result;
-
-      std::copy(
-         std::begin(data), std::end(data),
-         std::back_inserter(result));
-
-      return result;
+      return std::vector<unsigned char>(std::cbegin(data), std::cend(data));
    }
 
-   std::string from_range(std::vector<unsigned char> const & data)
+   auto from_range(std::vector<unsigned char> const & data)
    {
-      std::string result;
-
-      std::copy(
-         std::begin(data), std::end(data),
-         std::back_inserter(result));
-
-      return result;
+      return std::string(std::cbegin(data), std::cend(data));
    }
 };
 
@@ -181,9 +169,7 @@ int main()
    for (auto const & v : data)
    {
       auto encv = enc.to_base64(v);
-
       auto decv = enc.from_base64(encv);
-
       assert(v == decv);
    }
 

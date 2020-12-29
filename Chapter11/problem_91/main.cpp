@@ -71,11 +71,11 @@ int main()
 
    auto pos = std::find_if(
       std::cbegin(users), std::cend(users),
-      [username, hash](user const & u) {
+      [username, hash](const auto& u) {
       return u.username == username &&
          u.password == hash; });
 
-   if (pos != std::end(users))
+   if (pos != std::cend(users))
       std::cout << "Login successful!" << std::endl;
    else
       std::cout << "Invalid username or password" << std::endl;

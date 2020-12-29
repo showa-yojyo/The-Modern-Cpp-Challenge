@@ -39,7 +39,6 @@ std::string compute_hash(fs::path const & filepath)
          file.read(buffer, 4096);
 
          auto extracted = static_cast<size_t>(file.gcount());
-
          if (extracted > 0)
          {
             hash.Update(

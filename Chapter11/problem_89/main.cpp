@@ -7,7 +7,7 @@
 #include <cassert>
 
 // 前項参照
-std::string caesar_encrypt(std::string_view text, int const shift)
+std::string caesar_encrypt(std::string_view text, int shift)
 {
    std::string str;
    str.reserve(text.length());
@@ -23,7 +23,7 @@ std::string caesar_encrypt(std::string_view text, int const shift)
 }
 
 // 前項参照
-std::string caesar_decrypt(std::string_view text, int const shift)
+std::string caesar_decrypt(std::string_view text, int shift)
 {
    std::string str;
    str.reserve(text.length());
