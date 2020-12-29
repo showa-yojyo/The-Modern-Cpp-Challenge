@@ -62,7 +62,7 @@ void print_pdf(
             pdf.WritePageAndRelease(page);
          }
 
-         page = new PDFPage();
+         page = new PDFPage;
          page->SetMediaBox(PDFRectangle(0, 0, width, height));
          context = pdf.StartPageContentContext(page);
 

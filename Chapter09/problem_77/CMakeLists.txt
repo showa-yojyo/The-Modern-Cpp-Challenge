@@ -10,14 +10,14 @@ elseif(WIN32)
 
   add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 endif()
-message(status "** CMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS}")
 
 set(INCLUDE_PATH "${CMAKE_SOURCE_DIR}/../../include")
 set(LIBS_PATH "${CMAKE_SOURCE_DIR}/../../libs")
 
-include_directories(${LIBS_PATH}/PDF-Writer)
-include_directories(${LIBS_PATH}/PDF-Writer/FreeType/include)
-include_directories(${INCLUDE_PATH})
+include_directories(
+    ${LIBS_PATH}/PDF-Writer
+    ${LIBS_PATH}/PDF-Writer/FreeType/include
+    ${INCLUDE_PATH})
 
 link_directories(
    ${LIBS_PATH}/ZipLib/build
@@ -37,13 +37,15 @@ endif()
 
 add_executable(problem_77 main.cpp)
 
-target_link_libraries(problem_77 ZipLib)
-target_link_libraries(problem_77 PDFWriter)
-target_link_libraries(problem_77 FreeType)
-target_link_libraries(problem_77 LibAesgm)
-target_link_libraries(problem_77 LibJpeg)
-target_link_libraries(problem_77 LibPng)
-target_link_libraries(problem_77 LibTiff)
-target_link_libraries(problem_77 Zlib)
+target_link_libraries(
+   problem_77
+   ZipLib
+   PDFWriter
+   FreeType
+   LibAesgm
+   LibJpeg
+   LibPng
+   LibTiff
+   Zlib)
 
 set_target_properties (problem_77 PROPERTIES FOLDER "09.DataSerialization")
