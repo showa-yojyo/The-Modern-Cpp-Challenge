@@ -6,32 +6,44 @@
 #include <algorithm>
 
 // モダンな enum
-enum class procstatus {suspended, running};
+enum class procstatus
+{
+   suspended,
+   running
+};
 
 std::string status_to_string(procstatus status)
 {
-   if (status == procstatus::suspended) return "suspended";
-   else return "running";
+   if (status == procstatus::suspended)
+      return "suspended";
+   else
+      return "running";
 }
 
 // モダンな enum
-enum class platforms {p32bit, p64bit};
+enum class platforms
+{
+   p32bit,
+   p64bit
+};
 
 std::string platform_to_string(platforms platform)
 {
-   if (platform == platforms::p32bit) return "32-bit";
-   else return "64-bit";
+   if (platform == platforms::p32bit)
+      return "32-bit";
+   else
+      return "64-bit";
 }
 
 // ほぼ POD
 struct procinfo
 {
-   int         id;
+   int id;
    std::string name;
-   procstatus  status;
+   procstatus status;
    std::string account;
-   size_t      memory;
-   platforms   platform;
+   size_t memory;
+   platforms platform;
 };
 
 // 引数が値渡しである理由はコードを読めばすぐにわかる。
@@ -40,23 +52,22 @@ void print_processes(std::vector<procinfo> processes)
    // ラムダ式を使ってソートする。
    // 出力機能がいちいち引数をコピーするのは問題かもしれない。
    std::sort(
-      std::cbegin(processes), std::cend(processes),
-      [](procinfo const & p1, procinfo const & p2) {
-         return p1.name < p2.name; });
+       std::begin(processes), std::end(processes),
+       [](procinfo const &p1, procinfo const &p2) { return p1.name < p2.name; });
 
    // 範囲 for 文
-   for (auto const & pi : processes)
+   for (auto const &pi : processes)
    {
       std::cout << std::left << std::setw(25) << std::setfill(' ')
-         << pi.name;
+                << pi.name;
       std::cout << std::right << std::setw(8) << std::setfill(' ')
-         << pi.id;
+                << pi.id;
       std::cout << std::left << ' ' << std::setw(12) << std::setfill(' ')
-         << status_to_string(pi.status);
+                << status_to_string(pi.status);
       std::cout << std::left << std::setw(15) << std::setfill(' ')
-         << pi.account;
+                << pi.account;
       std::cout << std::right << std::setw(10) << std::setfill(' ')
-         << size_t{pi.memory/1024};
+                << size_t{pi.memory / 1024};
       // std::right のあとは空白文字を挟む
       std::cout << std::left << ' ' << platform_to_string(pi.platform);
       std::cout << std::endl;
@@ -69,13 +80,12 @@ int main()
    using namespace std::string_literals;
 
    // プロセス名をリアルにする
-   std::vector<procinfo> processes
-   {
-      {512, "cmd.exe"s, procstatus::running, "SYSTEM"s, 148293, platforms::p64bit },
-      {1044, "chrome.exe"s, procstatus::running, "marius.bancila"s, 25180454, platforms::p32bit},
-      {7108, "explorer.exe"s, procstatus::running, "marius.bancila"s, 2952943, platforms::p64bit },
-      {10100, "chrome.exe"s, procstatus::running, "marius.bancila"s, 227756123, platforms::p32bit},
-      {22456, "skype.exe"s, procstatus::suspended, "marius.bancila"s, 16870123, platforms::p64bit },
+   std::vector<procinfo> processes{
+       {512, "cmd.exe"s, procstatus::running, "SYSTEM"s, 148293, platforms::p64bit},
+       {1044, "chrome.exe"s, procstatus::running, "marius.bancila"s, 25180454, platforms::p32bit},
+       {7108, "explorer.exe"s, procstatus::running, "marius.bancila"s, 2952943, platforms::p64bit},
+       {10100, "chrome.exe"s, procstatus::running, "marius.bancila"s, 227756123, platforms::p32bit},
+       {22456, "skype.exe"s, procstatus::suspended, "marius.bancila"s, 16870123, platforms::p64bit},
    };
 
    print_processes(processes);

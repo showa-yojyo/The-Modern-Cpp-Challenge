@@ -2,24 +2,10 @@ cmake_minimum_required (VERSION 3.7.0)
 project(problem_79)
 
 if (UNIX)
-  message(status "** Setting GCC flags")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1z -fexceptions -g -Wall -pthread")
-elseif(WIN32)
-  message(status "** Setting MSVC flags")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc /std:c++latest")
-
-  add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 endif()
-message(status "** CMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS}")
 
-set(INCLUDE_PATH "${CMAKE_SOURCE_DIR}/../../include")
-set(LIBS_PATH "${CMAKE_SOURCE_DIR}/../../libs")
 include_directories(${LIBS_PATH}/ZipLib)
-link_directories(
-   ${LIBS_PATH}/ZipLib/build
-   ${LIBS_PATH}/ZipLib/build/extlibs/bzip2
-   ${LIBS_PATH}/ZipLib/build/extlibs/lzma
-   ${LIBS_PATH}/ZipLib/build/extlibs/zlib)
 
 if(BOOST_FILESYSTEM)
    include_directories(${BOOST_INCLUDE_DIR})

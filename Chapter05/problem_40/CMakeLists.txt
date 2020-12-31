@@ -1,7 +1,6 @@
 cmake_minimum_required (VERSION 3.7.0)
 project(problem_40)
 
-set(LIBS_PATH "${CMAKE_SOURCE_DIR}/../../libs")
 include_directories(${LIBS_PATH}/date/include/date)
 
 add_executable(problem_40 main.cpp)

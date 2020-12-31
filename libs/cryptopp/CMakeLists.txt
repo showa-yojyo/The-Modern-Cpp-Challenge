@@ -1,12 +1,14 @@
-cmake_minimum_required (VERSION 3.7.0) 
-project(cryptlib)
+cmake_minimum_required (VERSION 3.7.0)
+project(cryptopp)
 
-add_definitions(-DUSE_PRECOMPILED_HEADERS)
-add_definitions(-D_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS)
+add_definitions(
+    -DNDEBUG
+    -DUSE_PRECOMPILED_HEADERS
+    -D_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS)
 
 file(GLOB headers *.h)
 file(GLOB sources *.cpp)
 
-add_library (cryptlib STATIC ${headers} ${sources})
+add_library (cryptopp STATIC ${headers} ${sources})
 
-set_target_properties (cryptlib PROPERTIES FOLDER "00.Libs")
+set_target_properties (cryptopp PROPERTIES FOLDER "00.Libs")

@@ -2,21 +2,12 @@ cmake_minimum_required (VERSION 3.7.0)
 project(problem_93)
 
 if (UNIX)
-  message(status "** Setting GCC flags")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1z -fexceptions -g -Wall -pthread")
-elseif(WIN32)
-  message(status "** Setting MSVC flags")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc /std:c++latest")
-
-  add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 endif()
-message(status "** CMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS}")
 
-set(INCLUDE_PATH "${CMAKE_SOURCE_DIR}/../../include")
-set(LIBS_PATH "${CMAKE_SOURCE_DIR}/../../libs")
-
+add_definitions(-DCRYPTOPP_CXX11_LAMBDA)
 include_directories(${LIBS_PATH}/cryptopp)
-link_directories(${LIBS_PATH}/cryptopp)
+link_directories(${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/libs/cryptopp)
 
 if(BOOST_FILESYSTEM)
    include_directories(${BOOST_INCLUDE_DIR})
@@ -27,8 +18,6 @@ else()
       add_definitions(-DFILESYSTEM_EXPERIMENTAL)
    endif()
 endif()
-
-add_definitions(-DCRYPTOPP_CXX11_LAMBDA)
 
 add_executable(problem_93 main.cpp)
 

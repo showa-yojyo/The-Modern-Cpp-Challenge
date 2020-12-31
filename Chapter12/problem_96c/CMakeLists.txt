@@ -2,13 +2,10 @@ cmake_minimum_required (VERSION 3.7.0)
 project(problem_96c)
 
 if (UNIX)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1z -fexceptions -g -Wall -pthread")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 else()
   add_definitions(-D_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS -D_WIN32_WINNT=0x0601)
 endif()
-
-set(INCLUDE_PATH "${CMAKE_SOURCE_DIR}/../../include")
-set(LIBS_PATH "${CMAKE_SOURCE_DIR}/../../libs")
 
 include_directories(${LIBS_PATH}/asio/include)
 

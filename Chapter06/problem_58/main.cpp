@@ -61,7 +61,6 @@ void shortest_path(
    std::map<Vertex, Weight>& min_distance,
    std::map<Vertex, Vertex>& previous)
 {
-   auto const n = g.vertex_count();
    auto const vertices = g.vertices();
 
    min_distance.clear();
