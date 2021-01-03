@@ -1,15 +1,4 @@
 # Ignore all build subdirectories
-**/build
-lastlog.txt
-movies.xml
-movies.json
-movies.pdf
-sample.pdf
-test.png
-Chapter10/problem_83/validation.png
-Chapter10/problem_84/*.png
-Chapter11/problem_94/rsa-*.key
-Chapter11/problem_94/sample.sign
 
 # Cmake files
 CMakeLists.txt.user
@@ -57,5 +46,6 @@ _deps
 *.out
 *.app
 
+bin/*
 libs/curl/tests/*
 libs/curl/**/.deps
