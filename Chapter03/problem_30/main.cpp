@@ -1,39 +1,41 @@
+// #30 URL パーツの抽出
 #include <string>
 #include <string_view>
 #include <regex>
-#include <assert.h>
+#include <cassert>
 
 #ifdef USE_BOOST_OPTIONAL
-#  include <boost/optional.hpp>
+#include <boost/optional.hpp>
 using boost::optional;
 #else
-#  include <optional>
+#include <optional>
 using std::optional;
 #endif
 
 struct uri_parts
 {
-   std::string           protocol;
-   std::string           domain;
-   optional<int>         port;
+   std::string protocol;
+   std::string domain;
+   optional<int> port;
    optional<std::string> path;
    optional<std::string> query;
    optional<std::string> fragment;
 };
 
-optional<uri_parts> parse_uri(std::string uri)
+optional<uri_parts> parse_uri(std::string_view uri)
 {
+   // この正規表現は無理にでも覚えておきたい
    std::regex rx(R"(^(\w+):\/\/([\w.-]+)(:(\d+))?([\w\/\.]+)?(\?([\w=&]*)(#?(\w+))?)?$)");
-   auto matches = std::smatch{};
+   std::cmatch matches;
 
-   if (std::regex_match(uri, matches, rx))
+   if (std::regex_match(uri.data(), matches, rx))
    {
       if (matches[1].matched && matches[2].matched)
       {
          uri_parts parts;
          parts.protocol = matches[1].str();
          parts.domain = matches[2].str();
-         if(matches[4].matched)
+         if (matches[4].matched)
             parts.port = std::stoi(matches[4]);
          if (matches[5].matched)
             parts.path = matches[5];

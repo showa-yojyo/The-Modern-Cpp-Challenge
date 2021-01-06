@@ -1,6 +1,7 @@
+// #4 与えられた正の整数より小さい最大の素数
 #include <iostream>
 
-bool is_prime(int const num)
+constexpr bool is_prime(int const num) noexcept
 {
    if (num <= 3)
    {
@@ -30,7 +31,7 @@ int main()
    std::cout << "Upper limit:";
    std::cin >> limit;
 
-   for (int i = limit; i > 1; i--)
+   for (auto i = limit; i > 1; i--)
    {
       if (is_prime(i))
       {

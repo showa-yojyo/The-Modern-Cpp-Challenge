@@ -1,14 +1,17 @@
+// #83 認証用テキスト付き PNG 画像を作る
 #include <iostream>
 #include <string>
 #include <string_view>
 #include <random>
 #include <array>
+#include <algorithm>
+#include <functional>
 
 #include "pngwriter.h"
 
 void create_image(
-   int const width, int const height, 
-   std::string_view font, int const font_size,
+   int width, int height,
+   std::string_view font, int font_size,
    std::string_view filepath)
 {
    pngwriter image{ width, height, 0, filepath.data() };
@@ -29,8 +32,8 @@ void create_image(
    {
       image.line(
          iter, 0, iter, height,
-         65535 - int(65535 * ((double)iter) / (width)),
-         int(65535 * ((double)iter) / (width)),
+         65535 - int(65535 * double(iter) / width),
+         int(65535 * double(iter) / width),
          65535);
    }
 
@@ -68,6 +71,7 @@ int main()
 {
    std::string font_path;
 
+// Linux はどうするのだ
 #ifdef _WIN32
       font_path = R"(c:\windows\fonts\arial.ttf)";
 #elif defined (__APPLE__)
@@ -77,7 +81,7 @@ int main()
    std::cin >> font_path;
 #endif
 
-   create_image(200, 50, 
+   create_image(200, 50,
                 font_path, 18,
                 "validation.png");
 }

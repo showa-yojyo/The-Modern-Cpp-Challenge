@@ -1,5 +1,9 @@
-cmake_minimum_required (VERSION 3.7.0) 
+cmake_minimum_required (VERSION 3.7.0)
 project(problem_81)
+
+if (UNIX)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
+endif()
 
 include_directories(${LIBS_PATH}/ZipLib)
 
@@ -18,12 +22,12 @@ add_executable(problem_81 main.cpp)
 if(BOOST_FILESYSTEM)
    if(UNIX)
       find_package(Boost COMPONENTS system filesystem REQUIRED)
-      
+
       target_link_libraries(problem_81 ${Boost_FILESYSTEM_LIBRARY}
                                        ${Boost_SYSTEM_LIBRARY})
    endif()
 endif()
 
-target_link_libraries(problem_81 ZipLib)
+target_link_libraries(problem_81 ZipLib bzip2 lzma zlib)
 
 set_target_properties (problem_81 PROPERTIES FOLDER "10.ArchivesImagesDatabases")

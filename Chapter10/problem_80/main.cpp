@@ -1,3 +1,4 @@
+// #80 Zip アーカイブの圧縮および解凍
 #include <iostream>
 #include <string>
 #include <string_view>
@@ -19,6 +20,7 @@ namespace fs = std::filesystem;
 #  endif
 #endif
 
+// std::function が目新しいようだが、この用例は面白くはない。
 void compress(
    fs::path const & source,
    fs::path const & archive,
@@ -27,9 +29,10 @@ void compress(
    if (fs::is_regular_file(source))
    {
       if (reporter) reporter("Compressing " + source.string());
+      // zip ファイルに付け足す
       ZipFile::AddFile(archive.string(), source.string(), LzmaMethod::Create());
    }
-   else
+   else // ?
    {
       for (auto const & p : fs::recursive_directory_iterator(source))
       {
@@ -44,6 +47,7 @@ void compress(
          }
          else if (fs::is_regular_file(p))
          {
+            // zip ファイルに付け足す
             ZipFile::AddFile(archive.string(), p.path().string(), LzmaMethod::Create());
          }
       }
@@ -68,14 +72,14 @@ void decompress(
    fs::path const & archive,
    std::function<void(std::string_view)> reporter)
 {
+   // 解凍先のディレクトリーが存在しないといけない。
    ensure_directory_exists(destination);
 
    auto zipArchive = ZipFile::Open(archive.string());
 
    for (size_t i = 0; i < zipArchive->GetEntriesCount(); ++i)
    {
-      auto entry = zipArchive->GetEntry(i);
-      if (entry)
+      if (auto entry = zipArchive->GetEntry(i))
       {
          auto filepath = destination / fs::path{ entry->GetFullName() }.relative_path();
          if (reporter) reporter("Creating " + filepath.string());
@@ -92,15 +96,13 @@ void decompress(
             destFile.open(
                filepath.string().c_str(),
                std::ios::binary | std::ios::trunc);
-
             if (!destFile.is_open())
             {
                if (reporter)
                   reporter("Cannot create destination file!");
             }
 
-            auto dataStream = entry->GetDecompressionStream();
-            if (dataStream)
+            if (auto dataStream = entry->GetDecompressionStream())
             {
                utils::stream::copy(*dataStream, destFile);
             }
@@ -124,7 +126,7 @@ int main()
       std::cout << "Enter archive path:";
       std::cin >> archivepath;
 
-      compress(inputpath, archivepath, [](std::string_view message) {std::cout << message << std::endl; });
+      compress(inputpath, archivepath, [](auto message) {std::cout << message << std::endl; });
    }
    else if (option == 'd')
    {
@@ -135,7 +137,7 @@ int main()
       std::cout << "Enter archive path:";
       std::cin >> archivepath;
 
-      decompress(outputpath, archivepath, [](std::string_view message) {std::cout << message << std::endl; });
+      decompress(outputpath, archivepath, [](auto message) {std::cout << message << std::endl; });
    }
    else
    {

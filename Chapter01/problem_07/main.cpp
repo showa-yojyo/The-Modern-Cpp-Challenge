@@ -1,11 +1,17 @@
+// #7 友愛数
+// 一方の数の真の約数の和がもう一方の数と等しくなり、
+// 他方の数の真の約数の和がもう一方の数と等しくなる二つの数の対。
 #include <iostream>
 #include <set>
 #include <cmath>
 
-int sum_proper_divisors(int const number)
+// 前項と同じものになる
+constexpr int sum_proper_divisors(int number) noexcept
 {
    int result = 1;
-   for (int i = 2; i <= std::sqrt(number); i++)
+   // これは書籍版のコードのほうがいいので書き換える。
+   auto root = static_cast<int>(std::sqrt(number));
+   for (auto i = 2; i <= root; i++)
    {
       if (number%i == 0)
       {
@@ -16,17 +22,14 @@ int sum_proper_divisors(int const number)
    return result;
 }
 
-void print_amicables(int const limit)
+void print_amicables(int limit)
 {
-   for (int number = 4; number < limit; ++number)
+   for (decltype(limit) number = 4; number < limit; ++number)
    {
-      auto sum1 = sum_proper_divisors(number);
-
-      if (sum1 < limit)
+      if (auto sum1 = sum_proper_divisors(number); sum1 < limit)
       {
-         auto sum2 = sum_proper_divisors(sum1);
-
-         if (sum2 == number && number != sum1)
+         if (auto sum2 = sum_proper_divisors(sum1);
+             sum2 == number && number != sum1)
          {
             std::cout << number << "," << sum1 << std::endl;
          }
@@ -34,20 +37,18 @@ void print_amicables(int const limit)
    }
 }
 
-void print_amicables_once(int const limit)
+// こちらは練習問題の解答例だろう
+void print_amicables_once(int limit)
 {
    std::set<int> printed;
-   for (int number = 4; number < limit; ++number)
+   for (decltype(limit) number = 4; number < limit; ++number)
    {
       if (printed.find(number) != printed.end()) continue;
 
-      auto sum1 = sum_proper_divisors(number);
-
-      if (sum1 < limit)
+      if (auto sum1 = sum_proper_divisors(number); sum1 < limit)
       {
-         auto sum2 = sum_proper_divisors(sum1);
-
-         if (sum2 == number && number != sum1)
+         if (auto sum2 = sum_proper_divisors(sum1);
+             sum2 == number && number != sum1)
          {
             printed.insert(number);
             printed.insert(sum1);

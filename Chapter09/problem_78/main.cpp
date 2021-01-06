@@ -1,3 +1,4 @@
+// #78 画像を集めて PDF を作る
 #include <iostream>
 #include <string_view>
 
@@ -19,6 +20,8 @@ namespace fs = std::filesystem;
 #  endif
 #endif
 
+// ディレクトリーの JPG ファイルすべてのパスを返す。
+// std::filesystem の学習用コード
 std::vector<std::string> get_images(fs::path const & dirpath)
 {
    std::vector<std::string> paths;
@@ -32,6 +35,7 @@ std::vector<std::string> get_images(fs::path const & dirpath)
    return paths;
 }
 
+// JPG 画像を含む PDF ファイルを保存する。
 void print_pdf(
    fs::path const & pdfpath,
    fs::path const & dirpath)
@@ -61,7 +65,7 @@ void print_pdf(
             pdf.WritePageAndRelease(page);
          }
 
-         page = new PDFPage();
+         page = new PDFPage;
          page->SetMediaBox(PDFRectangle(0, 0, width, height));
          context = pdf.StartPageContentContext(page);
 

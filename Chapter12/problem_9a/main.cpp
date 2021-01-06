@@ -1,3 +1,4 @@
+// #100 画像内にある顔を検出する
 #include <iostream>
 #include <string>
 #include <string_view>
@@ -199,8 +200,8 @@ void from_json(const json& jdata, face_error_response& response)
 class face_manager
 {
 public:
-   face_manager(std::string_view endpoint, 
-                std::string_view key) 
+   face_manager(std::string_view endpoint,
+                std::string_view key)
       : endpoint(endpoint), app_key(key)
    {}
 
@@ -252,7 +253,7 @@ public:
    }
 private:
    face_detect_response parse_detect_response(
-      long const status, 
+      long status,
       std::stringstream & str)
    {
       json jdata;
@@ -274,7 +275,7 @@ private:
                << response.error.message << std::endl;
          }
       }
-      catch (std::exception const & ex) 
+      catch (std::exception const & ex)
       {
          std::cout << ex.what() << std::endl;
       }
@@ -288,10 +289,12 @@ private:
 
 int main()
 {
+   // Microsoft Azure の Cognitive Services を使う
+   // Face API
    face_manager manager(
       "https://westeurope.api.cognitive.microsoft.com/face/v1.0",
       "...(your api key)...");
-   
+
 #ifdef _WIN32
    std::string path = R"(res\albert_and_elsa.jpg)";
 #else
@@ -305,7 +308,7 @@ int main()
       std::cout << "faceId: " << face.faceId << std::endl
                 << "age:    " << face.attributes.age << std::endl
                 << "gender: " << face.attributes.gender << std::endl
-                << "rect:   " << "{" << face.rectangle.left 
+                << "rect:   " << "{" << face.rectangle.left
                               << "," << face.rectangle.top
                               << "," << face.rectangle.width
                               << "," << face.rectangle.height

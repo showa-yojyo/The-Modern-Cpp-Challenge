@@ -1,10 +1,11 @@
+// #84 EAN-13 バーコード
 #include <iostream>
 #include <string_view>
 #include <array>
 #include <algorithm>
 #include <numeric>
 #include <bitset>
-#include <assert.h>
+#include <cassert>
 
 #include "pngwriter.h"
 
@@ -38,8 +39,8 @@ public:
          result[i] = static_cast<unsigned char>(number[i] - '0');
       return result;
    }
-   
-   std::string to_string() const noexcept
+
+   const std::string& to_string() const noexcept
    {
       return number;
    }
@@ -49,9 +50,10 @@ private:
    {
       unsigned char weights[12] = { 1,3,1,3,1,3,1,3,1,3,1,3 };
       size_t index = 0;
+      // ラムダ式にはもう慣れたか？
       auto sum = std::accumulate(
          std::begin(code), std::end(code), 0,
-         [&weights, &index](int const total, char const c) {
+         [&weights, &index](auto total, auto c) {
          return total + weights[index++] * (c - '0'); });
 
       return 10 - sum % 10;
@@ -64,9 +66,9 @@ struct ean13_barcode_generator
 {
    void create(ean13 const & code,
       std::string_view filename,
-      int const digit_width = 3,
-      int const height = 50,
-      int const margin = 10)
+      int digit_width = 3,
+      int height = 50,
+      int margin = 10)
    {
       pngwriter image(
          margin * 2 + 95 * digit_width,
@@ -102,8 +104,8 @@ private:
    int draw_digit(
       unsigned char code, unsigned int size,
       pngwriter& image,
-      int const x, int const y,
-      int const digit_width, int const height)
+      int x, int y,
+      int digit_width, int height)
    {
       std::bitset<7> bits(code);
       int pos = x;
@@ -164,8 +166,8 @@ int main()
    ean13_barcode_generator generator;
 
    generator.create(
-      ean13("8711253001202"), 
-      "8711253001202.png", 
+      ean13("8711253001202"),
+      "8711253001202.png",
       5, 150, 30);
 
    generator.create(

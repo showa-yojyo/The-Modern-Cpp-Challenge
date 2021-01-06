@@ -1,7 +1,13 @@
-cmake_minimum_required (VERSION 3.7.0) 
+cmake_minimum_required (VERSION 3.7.0)
 project(problem_94)
 
+if (UNIX)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
+endif()
+
+add_definitions(-DCRYPTOPP_CXX11_LAMBDA)
 include_directories(${LIBS_PATH}/cryptopp)
+link_directories(${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/libs/cryptopp)
 
 if(BOOST_FILESYSTEM)
    include_directories(${BOOST_INCLUDE_DIR})
@@ -13,20 +19,18 @@ else()
    endif()
 endif()
 
-add_definitions(-DCRYPTOPP_CXX11_LAMBDA)
-
 add_executable(problem_94 main.cpp)
 
 if(BOOST_FILESYSTEM)
    if(UNIX)
       find_package(Boost COMPONENTS system filesystem REQUIRED)
-      
+
       target_link_libraries(problem_94 ${Boost_FILESYSTEM_LIBRARY}
                                        ${Boost_SYSTEM_LIBRARY})
    endif()
 endif()
 
-target_link_libraries(problem_94 cryptlib)
+target_link_libraries(problem_94 cryptopp)
 
 add_custom_command(TARGET problem_94 PRE_BUILD
                    COMMAND ${CMAKE_COMMAND} -E copy
@@ -35,5 +39,5 @@ add_custom_command(TARGET problem_94 PRE_BUILD
 add_custom_command(TARGET problem_94 PRE_BUILD
                    COMMAND ${CMAKE_COMMAND} -E copy
                    ${PROJECT_SOURCE_DIR}/sample.txt ${CMAKE_CURRENT_BINARY_DIR})
-                   
+
 set_target_properties (problem_94 PROPERTIES FOLDER "11.Cryptography")

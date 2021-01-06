@@ -1,3 +1,5 @@
+// #58 ノード間の最短距離
+// Boost.Graph の dijkstra_shortest_path() のようなものを作る。
 #include <iostream>
 #include <queue>
 #include <set>
@@ -7,6 +9,7 @@
 #include <numeric>
 #include <string>
 
+//
 template <typename Vertex = int, typename Weight = double>
 class graph
 {
@@ -15,15 +18,19 @@ public:
    typedef Weight                      weight_type;
    typedef std::pair<Vertex, Weight>   neighbor_type;
    typedef std::vector<neighbor_type>  neighbor_list_type;
+
 public:
-   void add_edge(Vertex const source, Vertex const target, Weight const weight, bool const bidirectional = true)
+
+   void add_edge(Vertex source, Vertex target, Weight weight)
    {
       adjacency_list[source].push_back(std::make_pair(target, weight));
       adjacency_list[target].push_back(std::make_pair(source, weight));
    }
 
-   size_t vertex_count() const { return adjacency_list.size(); }
-   std::vector<Vertex> verteces() const
+   size_t vertex_count() const noexcept{ return adjacency_list.size(); }
+
+   // 頂点のコピーを返す
+   std::vector<Vertex> vertices() const
    {
       std::vector<Vertex> keys;
       for (auto const & kvp : adjacency_list)
@@ -46,6 +53,7 @@ private:
    std::map<vertex_type, neighbor_list_type> adjacency_list;
 };
 
+// Wikipedia の擬似コードを C++ コードに起こしたものらしい。
 template <typename Vertex, typename Weight>
 void shortest_path(
    graph<Vertex, Weight> const & g,
@@ -53,11 +61,10 @@ void shortest_path(
    std::map<Vertex, Weight>& min_distance,
    std::map<Vertex, Vertex>& previous)
 {
-   auto const n = g.vertex_count();
-   auto const verteces = g.verteces();
+   auto const vertices = g.vertices();
 
    min_distance.clear();
-   for (auto const & v : verteces)
+   for (auto const & v : vertices)
       min_distance[v] = graph<Vertex, Weight>::Infinity;
    min_distance[source] = 0;
 
@@ -111,6 +118,7 @@ std::vector<Vertex> build_path(
 {
    std::vector<Vertex> result;
    build_path(prev, v, result);
+   // グラフをいじっていると reverse() をよく使いたくなるものだ。
    std::reverse(std::begin(result), std::end(result));
    return result;
 }
@@ -118,6 +126,7 @@ std::vector<Vertex> build_path(
 template <typename Vertex>
 void print_path(std::vector<Vertex> const & path)
 {
+   // Python の '->'.join(path) のような出力をする
    for (size_t i = 0; i < path.size(); ++i)
    {
       std::cout << path[i];
@@ -188,8 +197,8 @@ int main()
    {
       auto g = make_graph();
 
-      char source = 'A';
-      std::map<char, double>  min_distance;
+      auto source = 'A';
+      std::map<char, double> min_distance;
       std::map<char, char> previous;
       shortest_path(g, source, min_distance, previous);
 
@@ -207,7 +216,7 @@ int main()
    {
       auto g = make_graph_wiki();
 
-      char source = 'A';
+      auto source = 'A';
       std::map<char, double>  min_distance;
       std::map<char, char> previous;
       shortest_path(g, source, min_distance, previous);
@@ -227,7 +236,7 @@ int main()
       auto g = make_graph_map();
 
       std::string source = "London";
-      std::map<std::string, double>  min_distance;
+      std::map<std::string, double> min_distance;
       std::map<std::string, std::string> previous;
       shortest_path(g, source, min_distance, previous);
 

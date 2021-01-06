@@ -1,8 +1,15 @@
+// #45 優先度付きキュー
+// 要件：
+// top() のコストが O(N)
+// pusu(), pop() のコストが O(logN)
+// size(), empty() を提供する
+// 比較演算を指定可能にする
 #include <iostream>
 #include <vector>
 #include <algorithm>
-#include <assert.h>
+#include <cassert>
 
+// std::vector のアダプターとする priority_queue は珍しいような？
 template <class T,
    class Compare = std::less<typename std::vector<T>::value_type>>
    class priority_queue
@@ -12,9 +19,11 @@ template <class T,
    typedef typename std::vector<T>::reference       reference;
    typedef typename std::vector<T>::const_reference const_reference;
 public:
+   // noexcept に注意
    bool empty() const noexcept { return data.empty(); }
    size_type size() const noexcept { return data.size(); }
 
+   // ヒープが優先度付きキューを実装するのに最適だとのこと。
    void push(value_type const & value)
    {
       data.push_back(value);
@@ -27,7 +36,7 @@ public:
       data.pop_back();
    }
 
-   const_reference top() const { return data.front(); }
+   const_reference top() const noexcept{ return data.front(); }
 
    void swap(priority_queue& other) noexcept
    {
@@ -40,6 +49,7 @@ private:
    Compare comparer;
 };
 
+// noexcept かどうかわからないので lhs.swap(rhs) の noexcept 値を採用する
 template< class T, class Compare>
 void swap(
    priority_queue<T, Compare>& lhs,
@@ -64,4 +74,5 @@ int main()
       std::cout << q.top() << ' ';
       q.pop();
    }
+   std::cout << std::endl;
 }

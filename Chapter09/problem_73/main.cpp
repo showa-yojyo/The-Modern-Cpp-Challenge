@@ -1,8 +1,12 @@
+// #73 XML シリアライズ
 #include <string>
 #include <string_view>
-#include <assert.h>
+#include <cassert>
 
+// オープンソースの pugixml というライブラリーを採用
 #include "pugixml.hpp"
+
+// include/ 以下にある
 #include "movies.h"
 
 void serialize(movie_list const & movies, std::string_view filepath)
@@ -102,7 +106,7 @@ int main()
          {
             {"Keanu Reeves", "Neo"},
             {"Laurence Fishburne", "Morpheus"},
-            {"Carrie-Anne Moss", "Trinity"}, 
+            {"Carrie-Anne Moss", "Trinity"},
             {"Hugo Weaving", "Agent Smith"}
          },
          {"Lana Wachowski", "Lilly Wachowski"},
@@ -124,7 +128,7 @@ int main()
       }
    };
 
-   serialize(movies, "movies.xml");   
+   serialize(movies, "movies.xml");
 
    auto result = deserialize("movies.xml");
 

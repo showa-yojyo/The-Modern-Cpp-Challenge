@@ -1,3 +1,4 @@
+// #62 スレッドを用いた最詳細大要素を求める並列アルゴリズム
 #include <iostream>
 #include <vector>
 #include <array>
@@ -6,8 +7,9 @@
 #include <random>
 #include <chrono>
 #include <thread>
-#include <assert.h>
+#include <cassert>
 
+// pprocess() と対比するために回りくどいコードにしてある。
 template <typename Iterator, typename F>
 auto sprocess(Iterator begin, Iterator end, F&& f)
 {
@@ -28,6 +30,7 @@ auto smax(Iterator begin, Iterator end)
                     [](auto b, auto e){return *std::max_element(b, e);});
 }
 
+// 前項と同様の方針で
 template <typename Iterator, typename F>
 auto pprocess(Iterator begin, Iterator end, F&& f)
 {
@@ -38,14 +41,14 @@ auto pprocess(Iterator begin, Iterator end, F&& f)
    }
    else
    {
-      int thread_count = std::thread::hardware_concurrency();
+      auto thread_count = std::thread::hardware_concurrency();
       std::vector<std::thread> threads;
       std::vector<typename std::iterator_traits<Iterator>::value_type> mins(thread_count);
 
       auto first = begin;
       auto last = first;
       size /= thread_count;
-      for (int i = 0; i < thread_count; ++i)
+      for (decltype(thread_count) i = 0; i < thread_count; ++i)
       {
          first = last;
          if (i == thread_count - 1) last = end;
@@ -58,7 +61,7 @@ auto pprocess(Iterator begin, Iterator end, F&& f)
 
       for (auto & t : threads) t.join();
 
-      return std::forward<F>(f)(std::begin(mins), std::end(mins));
+      return std::forward<F>(f)(std::cbegin(mins), std::cend(mins));
    }
 }
 
@@ -76,6 +79,7 @@ auto pmax(Iterator begin, Iterator end)
                     [](auto b, auto e){return *std::max_element(b, e);});
 }
 
+// 前項と同様の方針で
 int main()
 {
    const size_t count = 10000000;
@@ -93,37 +97,37 @@ int main()
 
    {
       std::cout << "minimum element" << std::endl;
-      
+
       auto start = std::chrono::system_clock::now();
-      auto r1 = smin(std::begin(data), std::end(data));
+      auto r1 = smin(std::cbegin(data), std::cend(data));
       auto end = std::chrono::system_clock::now();
       auto t1 = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
       std::cout << "seq time: " << t1.count() << "ms" << std::endl;
 
       start = std::chrono::system_clock::now();
-      auto r2 = pmin(std::begin(data), std::end(data));
+      auto r2 = pmin(std::cbegin(data), std::cend(data));
       end = std::chrono::system_clock::now();
       auto t2 = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
       std::cout << "par time: " << t2.count() << "ms" << std::endl;
-      
+
       assert(r1 == r2);
    }
 
    {
       std::cout << "maximum element" << std::endl;
-      
+
       auto start = std::chrono::system_clock::now();
-      auto r1 = smax(std::begin(data), std::end(data));
+      auto r1 = smax(std::cbegin(data), std::cend(data));
       auto end = std::chrono::system_clock::now();
       auto t1 = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
       std::cout << "seq time: " << t1.count() << "ms" << std::endl;
-      
+
       start = std::chrono::system_clock::now();
-      auto r2 = pmax(std::begin(data), std::end(data));
+      auto r2 = pmax(std::cbegin(data), std::cend(data));
       end = std::chrono::system_clock::now();
       auto t2 = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
       std::cout << "par time: " << t2.count() << "ms" << std::endl;
-      
+
       assert(r1 == r2);
    }
 }

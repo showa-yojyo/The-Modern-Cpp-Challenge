@@ -1,3 +1,4 @@
+// #92 ファイルのハッシュを計算する
 #include <iostream>
 #include <string>
 #include <fstream>
@@ -38,7 +39,6 @@ std::string compute_hash(fs::path const & filepath)
          file.read(buffer, 4096);
 
          auto extracted = static_cast<size_t>(file.gcount());
-
          if (extracted > 0)
          {
             hash.Update(
@@ -59,6 +59,7 @@ std::string compute_hash(fs::path const & filepath)
       return result;
    }
 
+   // もっと上の方に書いて欲しい
    throw std::runtime_error("Cannot open file!");
 }
 

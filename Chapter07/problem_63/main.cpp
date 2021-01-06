@@ -1,3 +1,4 @@
+// #63 非同期関数を用いた最小最大を求める並列アルゴリズム
 #include <iostream>
 #include <vector>
 #include <array>
@@ -6,7 +7,7 @@
 #include <random>
 #include <chrono>
 #include <future>
-#include <assert.h>
+#include <cassert>
 
 template <typename Iterator, typename F>
 auto sprocess(Iterator begin, Iterator end, F&& f)
@@ -27,6 +28,7 @@ auto smax(Iterator begin, Iterator end)
    return sprocess(begin, end,
                    [](auto b, auto e){return *std::max_element(b, e);});
 }
+// 以上前項と同じ
 
 template <typename Iterator, typename F>
 auto pprocess(Iterator begin, Iterator end, F&& f)
@@ -38,32 +40,37 @@ auto pprocess(Iterator begin, Iterator end, F&& f)
    }
    else
    {
-      int task_count = std::thread::hardware_concurrency();
-      std::vector<std::future<typename std::iterator_traits<Iterator>::value_type>> tasks;
+      auto task_count = std::thread::hardware_concurrency();
+      using value_type = typename std::iterator_traits<Iterator>::value_type;
+      std::vector<std::future<value_type>> tasks;
 
       auto first = begin;
       auto last = first;
       size /= task_count;
-      for (int i = 0; i < task_count; ++i)
+      for (decltype(task_count) i = 0; i < task_count; ++i)
       {
          first = last;
          if (i == task_count - 1) last = end;
          else std::advance(last, size);
 
+         // std::async() により非同期処理する
          tasks.emplace_back(std::async(
-            std::launch::async,
+            std::launch::async, // 非同期実行を明示的に指示
             [first, last, &f]() {
                return std::forward<F>(f)(first, last);
          }));
       }
 
-      std::vector<typename std::iterator_traits<Iterator>::value_type> mins;
-      for (auto & t : tasks) 
+      // ここを書き換えたい
+      std::vector<value_type> mins;
+      for (auto & t : tasks)
          mins.push_back(t.get());
 
-      return std::forward<F>(f)(std::begin(mins), std::end(mins));
+      return std::forward<F>(f)(std::cbegin(mins), std::cend(mins));
    }
 }
+
+// 以下前項と同じ
 
 template <typename Iterator>
 auto pmin(Iterator begin, Iterator end)
@@ -96,37 +103,37 @@ int main()
 
    {
       std::cout << "minimum element" << std::endl;
-      
+
       auto start = std::chrono::system_clock::now();
-      auto r1 = smin(std::begin(data), std::end(data));
+      auto r1 = smin(std::cbegin(data), std::cend(data));
       auto end = std::chrono::system_clock::now();
       auto t1 = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
       std::cout << "seq time: " << t1.count() << "ms" << std::endl;
 
       start = std::chrono::system_clock::now();
-      auto r2 = pmin(std::begin(data), std::end(data));
+      auto r2 = pmin(std::cbegin(data), std::cend(data));
       end = std::chrono::system_clock::now();
       auto t2 = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
       std::cout << "par time: " << t2.count() << "ms" << std::endl;
 
       assert(r1 == r2);
    }
-   
+
    {
       std::cout << "maximum element" << std::endl;
-      
+
       auto start = std::chrono::system_clock::now();
-      auto r1 = smax(std::begin(data), std::end(data));
+      auto r1 = smax(std::cbegin(data), std::cend(data));
       auto end = std::chrono::system_clock::now();
       auto t1 = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
       std::cout << "seq time: " << t1.count() << "ms" << std::endl;
-      
+
       start = std::chrono::system_clock::now();
-      auto r2 = pmax(std::begin(data), std::end(data));
+      auto r2 = pmax(std::cbegin(data), std::cend(data));
       end = std::chrono::system_clock::now();
       auto t2 = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
       std::cout << "par time: " << t2.count() << "ms" << std::endl;
-      
+
       assert(r1 == r2);
    }
 }

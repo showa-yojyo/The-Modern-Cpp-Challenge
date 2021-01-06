@@ -1,8 +1,10 @@
-cmake_minimum_required (VERSION 3.7.0) 
+cmake_minimum_required (VERSION 3.7.0)
 project(problem_75)
 
-include_directories(${LIBS_PATH}/nlohmannjson)
-include_directories(${INCLUDE_PATH}/)
+
+include_directories(
+   ${LIBS_PATH}/nlohmannjson
+   ${INCLUDE_PATH})
 
 if(BOOST_OPTIONAL)
    include_directories(${BOOST_INCLUDE_DIR})

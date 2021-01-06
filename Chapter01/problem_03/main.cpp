@@ -1,40 +1,42 @@
+// #3 最小公倍数
 #include <iostream>
 #include <numeric>
 #include <vector>
 
-int gcd(int const a, int const b)
+// C++ 17 では <numeric> に std::lcm() がある (p. 5)
+constexpr auto lcm(int a, int b) noexcept -> decltype(a)
 {
-   return b == 0 ? a : gcd(b, a % b);
-}
-
-int lcm(int const a, int const b)
-{
-   int h = gcd(a, b);
+   // C++ 17 では <numeric> に std::gcd() がある (p. 4)
+   auto h = std::gcd(a, b);
    return h ? (a * (b / h)) : 0;
 }
 
 template<class InputIt>
-int lcmr(InputIt first, InputIt last)
+constexpr int lcmr(InputIt first, InputIt last) noexcept
 {
-   return std::accumulate(first, last, 1, lcm);
+   //return std::accumulate(first, last, 1, lcm);
+   // C++ 17 では <numeric> に std::lcm() がある (p. 5) が、
+   // 次のようにテンプレート引数を明示しないと g++ 9.3.0 はエラーを出す。
+   using IntType = typename InputIt::value_type;
+   return std::accumulate(first, last, 1, std::lcm<IntType, IntType>);
 }
 
 int main()
 {
-   int n = 0;
+   unsigned int n = 0;
    std::cout << "Input count:";
    std::cin >> n;
 
-   std::vector<int> numbers;
-   for (int i = 0; i < n; ++i)
+   std::vector<decltype(n)> numbers;
+   for (decltype(n) i = 0; i < n; ++i)
    {
-      int v{ 0 };
+      decltype(n) v{ 0 };
       std::cin >> v;
       numbers.push_back(v);
    }
 
    std::cout
       << "lcm="
-      << lcmr(std::begin(numbers), std::end(numbers))
+      << lcmr(std::cbegin(numbers), std::cend(numbers))
       << std::endl;
 }

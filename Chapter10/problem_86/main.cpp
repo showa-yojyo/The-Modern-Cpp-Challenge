@@ -1,17 +1,19 @@
+// #86 SQLite データベースに映画をトランザクションで挿入する
 #include <iostream>
 #include <vector>
 #include <string>
 #include <sstream>
 
+// 前項参照
 #include "sqlite3.h"
 #include "sqlite_modern_cpp.h"
 #include "movies.h"
 
-std::vector<std::string> split(std::string text, char const delimiter)
+std::vector<std::string> split(std::string text, char delimiter)
 {
-   auto sstr = std::stringstream{ text };
-   auto tokens = std::vector<std::string>{};
-   auto token = std::string{};
+   std::stringstream sstr{ text };
+   std::vector<std::string> tokens;
+   std::string token;
    while (std::getline(sstr, token, delimiter))
    {
       if (!token.empty()) tokens.push_back(token);
@@ -44,7 +46,7 @@ movie read_movie()
    std::getline(std::cin, m.title);
    std::cout << "Year: "; std::cin >> m.year;
    std::cout << "Length: "; std::cin >> m.length;
-   std::cin.ignore();
+   std::cin.ignore(); // 読み捨てる
    std::string directors;
    std::cout << "Directors: ";
    std::getline(std::cin, directors);
@@ -57,6 +59,8 @@ movie read_movie()
    std::cout << "Cast: ";
    std::getline(std::cin, cast);
    auto roles = split(cast, ',');
+
+   // パッと見ダサい
    for (auto const & r : roles)
    {
       auto pos = r.find_first_of('=');
@@ -69,15 +73,16 @@ movie read_movie()
    return m;
 }
 
-std::vector<std::string> get_directors(sqlite3_int64 const movie_id, 
+// 前項参照
+std::vector<std::string> get_directors(sqlite3_int64 movie_id,
                                        sqlite::database & db)
 {
    std::vector<std::string> result;
-   db << R"(select p.name from directors as d 
-            join persons as p on d.personid = p.rowid 
+   db << R"(select p.name from directors as d
+            join persons as p on d.personid = p.rowid
             where d.movieid = ?;)"
       << movie_id
-      >> [&result](std::string const name)
+      >> [&result](std::string name)
    {
       result.emplace_back(name);
    };
@@ -85,15 +90,15 @@ std::vector<std::string> get_directors(sqlite3_int64 const movie_id,
    return result;
 }
 
-std::vector<std::string> get_writers(sqlite3_int64 const movie_id, 
+std::vector<std::string> get_writers(sqlite3_int64 movie_id,
                                      sqlite::database & db)
 {
    std::vector<std::string> result;
    db << R"(select p.name from writers as w
-         join persons as p on w.personid = p.rowid 
+         join persons as p on w.personid = p.rowid
          where w.movieid = ?;)"
       << movie_id
-      >> [&result](std::string const name)
+      >> [&result](std::string name)
    {
       result.emplace_back(name);
    };
@@ -101,7 +106,7 @@ std::vector<std::string> get_writers(sqlite3_int64 const movie_id,
    return result;
 }
 
-std::vector<casting_role> get_cast(sqlite3_int64 const movie_id, 
+std::vector<casting_role> get_cast(sqlite3_int64 movie_id,
                                    sqlite::database & db)
 {
    std::vector<casting_role> result;
@@ -109,7 +114,7 @@ std::vector<casting_role> get_cast(sqlite3_int64 const movie_id,
          join persons as p on c.personid = p.rowid
          where c.movieid = ?;)"
       << movie_id
-      >> [&result](std::string const name, std::string role)
+      >> [&result](std::string name, std::string role)
    {
       result.emplace_back(casting_role{ name, role });
    };
@@ -122,8 +127,8 @@ movie_list get_movies(sqlite::database & db)
    movie_list movies;
 
    db << R"(select rowid, * from movies;)"
-      >> [&movies, &db](sqlite3_int64 const rowid, std::string const & title, 
-                        int const year, int const length)
+      >> [&movies, &db](sqlite3_int64 rowid, std::string const & title,
+                        int year, int length)
    {
       movies.emplace_back(movie{
          static_cast<unsigned int>(rowid),
@@ -142,10 +147,10 @@ movie_list get_movies(sqlite::database & db)
 sqlite_int64 get_person_id(std::string const & name, sqlite::database & db)
 {
    sqlite_int64 id = 0;
-   
+
    db << "select rowid from persons where name=?;"
       << name
-      >> [&id](sqlite_int64 const rowid) {id = rowid; };
+      >> [&id](sqlite_int64 rowid) {id = rowid; };
 
    return id;
 }
@@ -157,7 +162,7 @@ sqlite_int64 insert_person(std::string_view name, sqlite::database & db)
    return db.last_insert_rowid();
 }
 
-void insert_directors(sqlite_int64 const movie_id, 
+void insert_directors(sqlite_int64 movie_id,
                       std::vector<std::string> const & directors,
                       sqlite::database & db)
 {
@@ -174,7 +179,7 @@ void insert_directors(sqlite_int64 const movie_id,
    }
 }
 
-void insert_writers(sqlite_int64 const movie_id, 
+void insert_writers(sqlite_int64 movie_id,
                     std::vector<std::string> const & writers,
                     sqlite::database & db)
 {
@@ -191,7 +196,7 @@ void insert_writers(sqlite_int64 const movie_id,
    }
 }
 
-void insert_cast(sqlite_int64 const movie_id, 
+void insert_cast(sqlite_int64 movie_id,
                  std::vector<casting_role> const & cast,
                  sqlite::database & db)
 {

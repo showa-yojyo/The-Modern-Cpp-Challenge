@@ -1,16 +1,31 @@
+// #60 ライフゲーム
 #include <iostream>
 #include <vector>
 #include <random>
 #include <array>
 #include <thread>
 #include <chrono>
+#include <algorithm> // std::generate()
+#include <functional> // std::ref()
 
 class universe
 {
 private:
+   size_t rows;
+   size_t columns;
+
+   std::vector<unsigned char> grid;
+   const unsigned char alive = 1;
+   const unsigned char dead = 0;
+
+   std::uniform_int_distribution<> dist;
+   std::mt19937 mt;
+
+   // デフォルトコンストラクターは提供しない。
    universe() = delete;
 
 public:
+   // 新式 enum
    enum class seed
    {
       random,
@@ -18,33 +33,37 @@ public:
       small_explorer,
       explorer
    };
+
 public:
-   universe(size_t const width, size_t const height):
-      rows(height), columns(width),grid(width * height), dist(0, 4)
+   // ライフゲームのコンストラクター
+   universe(size_t width, size_t height):
+      rows(height), columns(width), grid(width * height), dist(0, 4)
    {
+      // 乱数
       std::random_device rd;
       auto seed_data = std::array<int, std::mt19937::state_size> {};
       std::generate(std::begin(seed_data), std::end(seed_data), std::ref(rd));
-      std::seed_seq seq(std::begin(seed_data), std::end(seed_data));
+      std::seed_seq seq(std::cbegin(seed_data), std::cend(seed_data));
       mt.seed(seq);
    }
 
    void run(
-      seed const s,
-      int const generations, 
-      std::chrono::milliseconds const ms = std::chrono::milliseconds(100))
+      seed s,
+      int generations,
+      std::chrono::milliseconds ms = std::chrono::milliseconds(100))
    {
       reset();
       initialize(s);
       display();
 
       int i = 0;
-      do 
+      do
       {
          next_generation();
          display();
 
          using namespace std::chrono_literals;
+         // 1ms を ms と書けるのか。
          std::this_thread::sleep_for(ms);
 
       } while (i++ < generations || generations == 0);
@@ -55,17 +74,18 @@ private:
    {
       std::vector<unsigned char> newgrid(grid.size());
 
-      for (size_t r = 0; r < rows; ++r)
+      for (decltype(rows) r = 0; r < rows; ++r)
       {
-         for (size_t c = 0; c < columns; ++c)
+         for (decltype(columns) c = 0; c < columns; ++c)
          {
+            // 生きている隣接細胞はいくつか
             auto count = count_neighbors(r, c);
 
             if (cell(c, r) == alive)
             {
                newgrid[r * columns + c] = (count == 2 || count == 3) ? alive : dead;
             }
-            else 
+            else
             {
                newgrid[r * columns + c] = (count == 3) ? alive : dead;
             }
@@ -74,7 +94,7 @@ private:
 
       grid.swap(newgrid);
    }
-    
+
    void reset_display()
    {
 #ifdef _WIN32
@@ -86,9 +106,9 @@ private:
    {
       reset_display();
 
-      for (size_t r = 0; r < rows; ++r)
+      for (decltype(rows) r = 0; r < rows; ++r)
       {
-         for (size_t c = 0; c < columns; ++c)
+         for (decltype(columns) c = 0; c < columns; ++c)
          {
             std::cout << (cell(c, r) ? '*' : ' ');
          }
@@ -96,7 +116,7 @@ private:
       }
    }
 
-   void initialize(seed const s)
+   void initialize(seed s)
    {
       if (s == seed::small_explorer)
       {
@@ -133,14 +153,14 @@ private:
       }
       else if (s == seed::ten_cell_row)
       {
-         for (size_t c = columns / 2 - 5; c < columns / 2 + 5; c++)
+         for (decltype(columns) c = columns / 2 - 5; c < columns / 2 + 5; c++)
             cell(c, rows / 2) = alive;
       }
       else
       {
-         for (size_t r = 0; r < rows; ++r)
+         for (decltype(rows) r = 0; r < rows; ++r)
          {
-            for (size_t c = 0; c < columns; ++c)
+            for (decltype(columns) c = 0; c < columns; ++c)
             {
                cell(c, r) = dist(mt) == 0 ? alive : dead;
             }
@@ -148,26 +168,29 @@ private:
       }
    }
 
+   // すべての細胞を死亡状態にする
    void reset()
    {
-      for (size_t r = 0; r < rows; ++r)
+      for (decltype(rows) r = 0; r < rows; ++r)
       {
-         for (size_t c = 0; c < columns; ++c)
+         for (decltype(columns) c = 0; c < columns; ++c)
          {
             cell(c, r) = dead;
          }
       }
    }
 
-    
-   int count_alive() { return 0; }
-    
+   constexpr int count_alive() const noexcept { return 0; }
+
+   // パラメーターパックに注意
    template<typename T1, typename... T>
-   auto count_alive(T1 s, T... ts) { return s + count_alive(ts...); }
-    
-   int count_neighbors(size_t const row, size_t const col)
+   auto count_alive(T1 s, T... ts) const noexcept { return s + count_alive(ts...); }
+
+   // 生きている隣接細胞はいくつか。
+   // ひじょうに面倒。
+   int count_neighbors(size_t row, size_t col) const
    {
-      if (row == 0 && col == 0) 
+      if (row == 0 && col == 0)
          return count_alive(cell(1, 0), cell(1,1), cell(0, 1));
       if (row == 0 && col == columns - 1)
          return count_alive(cell(columns - 2, 0), cell(columns - 2, 1), cell(columns - 1, 1));
@@ -183,25 +206,20 @@ private:
          return count_alive(cell(0, row - 1), cell(1, row - 1), cell(1, row), cell(1, row + 1), cell(0, row + 1));
       if (col == columns - 1 && row > 0 && row < rows - 1)
          return count_alive(cell(col, row - 1), cell(col - 1, row - 1), cell(col - 1, row), cell(col - 1, row + 1), cell(col, row + 1));
-         
+
       return count_alive(cell(col - 1, row - 1), cell(col, row - 1), cell(col + 1, row - 1), cell(col + 1, row), cell(col + 1, row + 1), cell(col, row + 1), cell(col - 1, row + 1), cell(col - 1, row));
    }
 
-   unsigned char& cell(size_t const col, size_t const row)
+   // lvalue としてアクセスする。
+   unsigned char& cell(size_t col, size_t row)
    {
       return grid[row * columns + col];
    }
 
-private:
-   size_t rows;
-   size_t columns;
-
-   std::vector<unsigned char> grid;
-   const unsigned char alive = 1;
-   const unsigned char dead = 0;
-
-   std::uniform_int_distribution<> dist;
-   std::mt19937 mt;
+   unsigned char cell(size_t col, size_t row) const
+   {
+      return grid[row * columns + col];
+   }
 };
 
 int main()

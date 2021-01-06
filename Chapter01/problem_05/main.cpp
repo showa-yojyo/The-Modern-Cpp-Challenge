@@ -1,6 +1,8 @@
+// #5 セクシー素数
 #include <iostream>
 
-bool is_prime(int const num)
+// 前項参照
+constexpr bool is_prime(int num) noexcept
 {
    if (num <= 3)
    {
@@ -30,7 +32,7 @@ int main()
    std::cout << "Upper limit:";
    std::cin >> limit;
 
-   for (int n = 2; n <= limit; n++)
+   for (auto n = 2; n <= limit; n++)
    {
       if (is_prime(n) && is_prime(n + 6))
       {
@@ -38,3 +40,10 @@ int main()
       }
    }
 }
+// Upper limit:30
+// 5,11
+// 7,13
+// 11,17
+// 13,19
+// 17,23
+// 23,29

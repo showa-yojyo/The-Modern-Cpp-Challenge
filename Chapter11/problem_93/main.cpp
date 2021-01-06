@@ -1,3 +1,5 @@
+// #93 ファイルの暗号化と復号
+// C++ の学習としては面白くない
 #include <iostream>
 #include <string>
 #include <string_view>
@@ -29,7 +31,8 @@ void encrypt_file(
       sourcefile.c_str(),
       true,
       new CryptoPP::DefaultEncryptorWithMAC(
-      (CryptoPP::byte*)password.data(), password.size(),
+         reinterpret_cast<const CryptoPP::byte*>(password.data()),
+         password.size(),
          new CryptoPP::FileSink(
             destfile.c_str())
       )
@@ -57,7 +60,8 @@ void decrypt_file(
       sourcefile.c_str(),
       true,
       new CryptoPP::DefaultDecryptorWithMAC(
-      (CryptoPP::byte*)password.data(), password.size(),
+         reinterpret_cast<const CryptoPP::byte*>(password.data()),
+         password.size(),
          new CryptoPP::FileSink(
             destfile.c_str())
       )

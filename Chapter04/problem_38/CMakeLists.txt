@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 3.7.0) 
+cmake_minimum_required (VERSION 3.7.0)
 project(problem_38)
 
 include_directories(${LIBS_PATH}/stduuid)
@@ -18,7 +18,7 @@ add_executable(problem_38 main.cpp)
 if(BOOST_FILESYSTEM)
    if(UNIX)
       find_package(Boost COMPONENTS system filesystem REQUIRED)
-      
+
       target_link_libraries(problem_38 ${Boost_FILESYSTEM_LIBRARY}
                                        ${Boost_SYSTEM_LIBRARY})
    endif()

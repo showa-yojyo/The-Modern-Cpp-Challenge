@@ -1,10 +1,12 @@
+// #82 国旗を表す PNG を作る
+// C++ の新機能学習という意味ではこれまでのものよりつまらない。
 #include <iostream>
 #include <string_view>
 #include <string>
 
 #include "pngwriter.h"
 
-void create_flag(int const width, int const height, std::string_view filepath)
+void create_flag(int width, int height, std::string_view filepath)
 {
    pngwriter flag{ width, height, 0, filepath.data() };
 
@@ -24,7 +26,7 @@ int main()
    int width = 0, height = 0;
    std::string filepath;
 
-   std::cout << "Width: "; 
+   std::cout << "Width: ";
    std::cin >> width;
 
    std::cout << "Heigh: ";

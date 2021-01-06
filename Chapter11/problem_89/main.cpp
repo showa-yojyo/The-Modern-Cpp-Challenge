@@ -1,9 +1,13 @@
+// #89 ヴィジュネル暗号
+//
+// C++ 新機能の学習には不向き
 #include <iostream>
 #include <string>
 #include <string_view>
-#include <assert.h>
+#include <cassert>
 
-std::string caesar_encrypt(std::string_view text, int const shift)
+// 前項参照
+std::string caesar_encrypt(std::string_view text, int shift)
 {
    std::string str;
    str.reserve(text.length());
@@ -14,11 +18,12 @@ std::string caesar_encrypt(std::string_view text, int const shift)
       else
          str += c;
    }
-   
+
    return str;
 }
 
-std::string caesar_decrypt(std::string_view text, int const shift)
+// 前項参照
+std::string caesar_decrypt(std::string_view text, int shift)
 {
    std::string str;
    str.reserve(text.length());
@@ -29,17 +34,18 @@ std::string caesar_decrypt(std::string_view text, int const shift)
       else
          str += c;
    }
-   
+
    return str;
 }
 
-
+// 本書 p. 237 の表
 std::string build_vigenere_table()
 {
    std::string table;
    table.reserve(26*26);
 
    for (int i = 0; i < 26; ++i)
+      // 前項のアルゴリズムを利用
       table += caesar_encrypt("ABCDEFGHIJKLMNOPQRSTUVWXYZ", i);
 
    return table;
